@@ -1,0 +1,1084 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<title>ML Portfolio Optimization &amp; Risk Forecasting &ndash; Project Dashboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<style>
+:root{
+  --bg:#F5F6FA;
+  --surface:#FFFFFF;
+  --surface2:#F0F2F7;
+  --border:#E1E4EB;
+  --text:#151E2B;
+  --muted:#647085;
+  --gold:#E8A200;
+  --gold-dark:#B87E00;
+  --teal:#1D8FA6;
+  --coral:#E1584C;
+  --sage:#3E9A66;
+  --violet:#7A6FCC;
+  --sand:#C77B2E;
+  --shadow:0 1px 2px rgba(21,30,43,0.04), 0 4px 14px rgba(21,30,43,0.05);
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  background:linear-gradient(180deg,#F8F9FC 0%,#F3F5F9 100%);
+  color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  font-variant-numeric:tabular-nums;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3,.serif{
+  font-family:Cambria,Georgia,"Times New Roman",serif;
+  font-weight:600;
+  letter-spacing:0.1px;
+}
+.app{display:flex;min-height:100vh;}
+
+/* ---------- Sidebar ---------- */
+.sidebar{
+  width:258px;flex:0 0 258px;
+  background:var(--surface);
+  border-right:1px solid var(--border);
+  padding:30px 20px;
+  position:sticky;top:0;height:100vh;
+  overflow-y:auto;
+}
+.brand{margin-bottom:32px;}
+.brand-mark{
+  width:38px;height:38px;border-radius:9px;
+  background:linear-gradient(135deg,var(--gold) 0%,var(--sand) 100%);
+  display:flex;align-items:center;justify-content:center;
+  font-family:Cambria,Georgia,serif;color:#fff;font-size:19px;font-weight:700;
+  margin-bottom:15px;box-shadow:0 3px 10px rgba(232,162,0,0.35);
+}
+.brand-title{font-size:14.5px;line-height:1.4;color:var(--text);font-weight:700;}
+.brand-sub{font-size:11.5px;color:var(--muted);margin-top:3px;}
+
+nav{display:flex;flex-direction:column;gap:3px;}
+.nav-item{
+  display:flex;align-items:center;gap:11px;
+  padding:10px 11px;border-radius:9px;
+  cursor:pointer;border:1px solid transparent;
+  transition:background 0.15s ease, transform 0.1s ease;
+}
+.nav-item:hover{background:var(--surface2);}
+.nav-item:active{transform:scale(0.98);}
+.nav-item.active{background:linear-gradient(135deg,#FFF6E2,#FFF0D0);border-color:#F2DFA3;box-shadow:0 1px 4px rgba(232,162,0,0.12);}
+.nav-icon{width:16px;height:16px;flex:0 0 16px;color:#B7BFCC;transition:color 0.15s ease;}
+.nav-item.active .nav-icon{color:var(--gold-dark);}
+.nav-icon svg{width:100%;height:100%;}
+.nav-num{
+  font-family:Cambria,Georgia,serif;
+  font-size:12.5px;color:var(--muted);flex:0 0 16px;
+}
+.nav-item.active .nav-num{color:var(--gold-dark);}
+.nav-label{font-size:13.5px;color:var(--text);font-weight:500;}
+.nav-item.active .nav-label{color:var(--gold-dark);font-weight:700;}
+
+.sidebar-foot{
+  margin-top:26px;padding-top:16px;border-top:1px solid var(--border);
+  font-size:11px;color:var(--muted);line-height:1.6;
+}
+.hint{
+  margin-top:18px;padding:12px 13px;border-radius:10px;
+  background:#F0F6FF;border:1px solid #D8E7FA;
+  font-size:11.3px;color:#3B5A7A;line-height:1.55;
+}
+.hint b{color:#1D5A8A;}
+
+.present-btn{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  width:100%;margin-top:16px;padding:11px 14px;border-radius:8px;
+  background:var(--text);color:#fff;border:none;font-size:13px;font-weight:600;
+  cursor:pointer;transition:background 0.15s ease;
+}
+.present-btn:hover{background:#2A3646;}
+.present-btn svg{width:15px;height:15px;flex:0 0 15px;}
+.exit-hint{font-size:10.8px;color:var(--muted);text-align:center;margin-top:8px;}
+
+:fullscreen .sidebar{padding-top:20px;}
+:fullscreen body{background:var(--bg);}
+:-webkit-full-screen .sidebar{padding-top:20px;}
+
+/* ---------- Main ---------- */
+main{flex:1;padding:44px 56px 100px;max-width:960px;}
+.section{display:block;padding-top:8px;scroll-margin-top:14px;}
+.section + .section{margin-top:8px;padding-top:44px;border-top:1px solid var(--border);}
+.section h1{font-size:24px;color:var(--text);margin:0 0 7px;letter-spacing:-0.3px;}
+.section#section-overview h1{font-size:30px;}
+.section .dek{font-size:14px;color:var(--muted);max-width:640px;line-height:1.6;margin-bottom:24px;}
+
+/* ---------- Floating presenter nav ---------- */
+.presenter-nav{
+  position:fixed;bottom:26px;left:50%;transform:translateX(-50%);
+  display:flex;align-items:center;gap:14px;
+  background:rgba(255,255,255,0.88);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  border:1px solid var(--border);border-radius:30px;padding:9px 14px;
+  box-shadow:0 6px 24px rgba(21,30,43,0.14), 0 1px 3px rgba(21,30,43,0.06);
+  z-index:50;
+}
+.pnav-btn{
+  width:34px;height:34px;border-radius:50%;border:none;background:var(--surface2);
+  color:var(--text);display:flex;align-items:center;justify-content:center;cursor:pointer;
+  transition:all 0.15s ease;flex:0 0 34px;
+}
+.pnav-btn:hover:not(:disabled){background:var(--gold);color:#fff;transform:scale(1.06);}
+.pnav-btn:disabled{opacity:0.3;cursor:default;}
+.pnav-btn svg{width:16px;height:16px;}
+.pnav-dots{display:flex;align-items:center;gap:7px;padding:0 4px;}
+.pnav-dot{width:7px;height:7px;border-radius:50%;background:#D5D9E0;cursor:pointer;transition:all 0.2s ease;border:none;padding:0;}
+.pnav-dot:hover{background:#B7BFCC;}
+.pnav-dot.active{background:var(--gold);width:20px;border-radius:4px;}
+.pnav-label{font-size:11.5px;color:var(--muted);padding:0 2px;white-space:nowrap;min-width:118px;}
+.pnav-kbd{font-size:10px;color:#AEB6C2;border:1px solid var(--border);border-radius:4px;padding:1px 5px;margin-left:2px;font-family:-apple-system,sans-serif;}
+
+.eyebrow{font-size:12.5px;color:var(--muted);margin-bottom:10px;letter-spacing:0.2px;}
+
+.crumb-bar{
+  position:sticky;top:0;z-index:15;
+  display:flex;align-items:center;gap:9px;
+  background:rgba(245,246,250,0.86);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  margin:0 -56px 18px;padding:12px 56px;
+  border-bottom:1px solid var(--border);
+  font-size:12px;color:var(--muted);font-weight:600;
+}
+.crumb-bar .crumb-icon{width:14px;height:14px;color:var(--gold-dark);flex:0 0 14px;}
+.crumb-bar .crumb-icon svg{width:100%;height:100%;}
+.crumb-bar b{color:var(--text);}
+
+.hero-stat{
+  border:1px solid #F0DFA5;background:linear-gradient(135deg,#FFFCF5 0%,#FFF6E2 55%,#FFF0D5 100%);
+  padding:32px 34px;border-radius:16px;margin-bottom:34px;
+  display:flex;align-items:center;gap:30px;flex-wrap:wrap;
+  box-shadow:0 4px 20px rgba(232,162,0,0.1), 0 1px 3px rgba(21,30,43,0.04);
+  position:relative;overflow:hidden;
+  animation:heroIn 0.55s cubic-bezier(.2,.8,.2,1);
+}
+.hero-stat::before{
+  content:"";position:absolute;top:-40%;right:-8%;width:260px;height:260px;border-radius:50%;
+  background:radial-gradient(circle,rgba(255,255,255,0.55),rgba(255,255,255,0));pointer-events:none;
+}
+.hero-num{font-family:Cambria,Georgia,serif;font-size:58px;color:var(--gold-dark);line-height:1;font-weight:700;letter-spacing:-1px;}
+.hero-text{font-size:14.5px;color:var(--text);max-width:400px;line-height:1.6;}
+.hero-text b{color:var(--gold-dark);font-weight:700;}
+.hero-spark{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:4px;margin-left:auto;}
+.hero-spark-label{font-size:10.5px;color:var(--muted);text-align:center;max-width:130px;line-height:1.4;}
+@keyframes heroIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+
+.card{
+  border:1px solid var(--border);background:var(--surface);
+  border-radius:14px;padding:23px 25px;margin-bottom:24px;
+  box-shadow:0 1px 2px rgba(21,30,43,0.03), 0 6px 18px rgba(21,30,43,0.045);
+  transition:box-shadow 0.2s ease, transform 0.2s ease;
+}
+.card:hover{box-shadow:0 4px 8px rgba(21,30,43,0.05), 0 12px 28px rgba(21,30,43,0.07);transform:translateY(-1px);}
+.card h3{font-size:15.5px;color:var(--text);margin:0 0 4px;font-weight:700;}
+.card .card-note{font-size:12.5px;color:var(--muted);margin-bottom:16px;line-height:1.55;}
+
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start;}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;align-items:start;}
+@media(max-width:820px){.grid-2,.grid-3{grid-template-columns:1fr;}}
+
+.stat-box{border:1px solid var(--border);border-radius:12px;padding:17px 19px;background:var(--surface2);transition:transform 0.15s ease, box-shadow 0.15s ease;}
+.stat-box:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(21,30,43,0.06);}
+.stat-box .label{font-size:11.5px;color:var(--muted);margin-bottom:6px;}
+.stat-box .value{font-family:Cambria,Georgia,serif;font-size:24px;color:var(--text);font-weight:700;}
+.stat-box.win .value{color:var(--gold-dark);}
+
+table{width:100%;border-collapse:collapse;font-size:12.8px;}
+th{
+  text-align:right;color:var(--muted);font-weight:600;
+  padding:8px 10px;border-bottom:1.5px solid var(--border);font-size:11.8px;
+}
+th:first-child,td:first-child{text-align:left;}
+td{padding:8px 10px;border-bottom:1px solid var(--border);color:var(--text);text-align:right;}
+tr:last-child td{border-bottom:none;}
+tr.highlight td{color:var(--gold-dark);font-weight:700;}
+tr.best td{background:#FFFAEE;}
+tr.hover-row:hover td{background:var(--surface2);cursor:pointer;}
+.tag{
+  display:inline-block;font-size:10.8px;padding:2px 7px;border-radius:4px;
+  border:1px solid var(--border);color:var(--muted);
+}
+
+/* ---------- Legend (clickable) ---------- */
+.legend{display:flex;gap:7px;flex-wrap:wrap;margin-top:14px;}
+.legend-item{
+  display:flex;align-items:center;gap:7px;font-size:12px;color:var(--text);font-weight:500;
+  padding:6px 12px 6px 9px;border-radius:20px;border:1px solid var(--border);
+  cursor:pointer;user-select:none;transition:all 0.15s ease;background:var(--surface);
+}
+.legend-item:hover{background:var(--surface2);border-color:#C7CCD6;transform:translateY(-1px);box-shadow:0 2px 6px rgba(21,30,43,0.06);}
+.legend-item.off{opacity:0.38;}
+.legend-item.off .legend-swatch{background:#C7CCD6 !important;}
+.legend-swatch{width:9px;height:9px;border-radius:3px;flex:0 0 9px;}
+
+/* ---------- Toggle buttons ---------- */
+.toggle-group{display:inline-flex;border:1px solid var(--border);border-radius:9px;overflow:hidden;margin-bottom:14px;box-shadow:0 1px 2px rgba(21,30,43,0.03);}
+.toggle-btn{
+  padding:8px 17px;font-size:12.5px;color:var(--muted);background:var(--surface);font-weight:500;
+  cursor:pointer;border:none;border-right:1px solid var(--border);transition:all 0.15s ease;
+}
+.toggle-btn:last-child{border-right:none;}
+.toggle-btn:hover{background:var(--surface2);}
+.toggle-btn.active{background:linear-gradient(135deg,var(--gold),#D89400);color:#fff;font-weight:700;}
+
+/* ---------- Tooltip ---------- */
+.chart-wrap{position:relative;}
+.chart-tooltip{
+  position:absolute;pointer-events:none;background:#182233;color:#fff;
+  border-radius:8px;padding:9px 12px;font-size:11.8px;line-height:1.6;
+  box-shadow:0 8px 24px rgba(21,30,43,0.25);opacity:0;transition:opacity 0.1s ease;
+  z-index:20;white-space:nowrap;
+}
+.chart-tooltip.show{opacity:1;}
+.chart-tooltip .tt-title{font-weight:700;margin-bottom:3px;color:#F0C766;}
+.chart-tooltip .tt-row{display:flex;align-items:center;gap:6px;}
+.chart-tooltip .tt-dot{width:8px;height:8px;border-radius:2px;display:inline-block;}
+
+.footnote{font-size:12px;color:var(--muted);line-height:1.6;margin-top:10px;}
+.divider{border:none;border-top:1px solid var(--border);margin:34px 0;}
+
+.tooltip-svg-label{font-size:10.5px;fill:var(--muted);font-family:-apple-system,sans-serif;}
+.hover-target{cursor:pointer;}
+
+</style>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark">&sigma;</div>
+        <div class="brand-title">ML Portfolio Optimization &amp; Risk Forecasting</div>
+        <div class="brand-sub">BIA405 Mini-Project &middot; GCBS</div>
+      </div>
+      <nav id="nav"></nav>
+      <div class="sidebar-foot">
+        Six companies &middot; 2020&ndash;2025<br/>
+        Weekly frequency &middot; 250 obs/ticker<br/>
+        All figures from the project's own pipeline output.
+      </div>
+      <button class="present-btn" id="present-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+        <span id="present-btn-label">Present full screen</span>
+      </button>
+      <div class="exit-hint">Press Esc to exit</div>
+    </aside>
+    <main id="main"></main>
+    <div class="presenter-nav" id="presenter-nav">
+      <button class="pnav-btn" id="pnav-prev" title="Previous (Left arrow)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+      <div class="pnav-dots" id="pnav-dots"></div>
+      <span class="pnav-label" id="pnav-label"></span>
+      <button class="pnav-btn" id="pnav-next" title="Next (Right arrow)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+      </button>
+      <span class="pnav-kbd">&larr; &rarr;</span>
+    </div>
+  </div>
+
+<script>
+// ============== Core infra ==============
+let CHART_SEQ = 0;
+let PENDING_INITS = [];
+function afterRender(fn) { PENDING_INITS.push(fn); }
+function runPendingInits() { const fns = PENDING_INITS; PENDING_INITS = []; fns.forEach((fn) => { try { fn(); } catch (e) { console.error("chart init error:", e); } }); }
+function nextId(prefix) { return prefix + "-" + CHART_SEQ++; }
+
+function scale(value, domainMin, domainMax, rangeMin, rangeMax) {
+  if (domainMax === domainMin) return (rangeMin + rangeMax) / 2;
+  return rangeMin + ((value - domainMin) / (domainMax - domainMin)) * (rangeMax - rangeMin);
+}
+function niceTicks(min, max, count) {
+  const ticks = [];
+  for (let i = 0; i <= count; i++) ticks.push(min + ((max - min) * i) / count);
+  return ticks;
+}
+function tooltipRow(color, label, value) {
+  return `<div class="tt-row"><span class="tt-dot" style="background:${color}"></span>${label}: <b style="margin-left:2px">${value}</b></div>`;
+}
+
+// ============== Interactive multi-line chart ==============
+function lineChart(opts) {
+  const { width = 760, height = 320, series, xLabels, yFormat = (v) => v.toFixed(2), showLegend = true, areaFor = null } = opts;
+  const id = nextId("lc");
+  const margin = { top: 16, right: 20, bottom: 34, left: 56 };
+  const w = width - margin.left - margin.right;
+  const h = height - margin.top - margin.bottom;
+
+  const allVals = series.flatMap((s) => s.values);
+  let yMin = Math.min(...allVals), yMax = Math.max(...allVals);
+  const pad = (yMax - yMin) * 0.08 || Math.abs(yMax) * 0.1 || 1;
+  yMin -= pad; yMax += pad;
+
+  const n = series[0].values.length;
+  const x = (i) => margin.left + scale(i, 0, n - 1, 0, w);
+  const y = (v) => margin.top + scale(v, yMax, yMin, 0, h);
+
+  const yTicks = niceTicks(yMin, yMax, 4);
+  const gridLines = yTicks.map((t) =>
+    `<line x1="${margin.left}" x2="${margin.left + w}" y1="${y(t)}" y2="${y(t)}" stroke="#E8EAEF" stroke-width="1"/>` +
+    `<text x="${margin.left - 8}" y="${y(t) + 4}" text-anchor="end" class="tooltip-svg-label">${yFormat(t)}</text>`
+  ).join("");
+
+  const xTickIdx = [];
+  const step = Math.max(1, Math.floor(n / (xLabels ? Math.min(xLabels.length, 6) : 6)));
+  for (let i = 0; i < n; i += step) xTickIdx.push(i);
+  if (n - 1 - xTickIdx[xTickIdx.length - 1] < step / 2) xTickIdx.pop();
+  xTickIdx.push(n - 1);
+  const xTicksSvg = xLabels ? xTickIdx.map((i, idx) => {
+    const anchor = idx === xTickIdx.length - 1 ? "end" : idx === 0 ? "start" : "middle";
+    return `<text x="${x(i)}" y="${margin.top + h + 20}" text-anchor="${anchor}" class="tooltip-svg-label">${xLabels[i]}</text>`;
+  }).join("") : "";
+
+  const areaSeries = areaFor ? series.find((s) => s.name === areaFor) : null;
+  const areaDef = areaSeries ? `<linearGradient id="${id}-area" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="${areaSeries.color}" stop-opacity="0.16"/>
+      <stop offset="100%" stop-color="${areaSeries.color}" stop-opacity="0"/>
+    </linearGradient>` : "";
+  const areaPath = areaSeries ? (() => {
+    const line = areaSeries.values.map((v, i) => `${i === 0 ? "M" : "L"} ${x(i).toFixed(1)} ${y(v).toFixed(1)}`).join(" ");
+    return `<path d="${line} L ${x(n - 1).toFixed(1)} ${margin.top + h} L ${x(0).toFixed(1)} ${margin.top + h} Z" fill="url(#${id}-area)"/>`;
+  })() : "";
+
+  const paths = series.map((s, si) =>
+    `<path id="${id}-path-${si}" d="${s.values.map((v, i) => `${i === 0 ? "M" : "L"} ${x(i).toFixed(1)} ${y(v).toFixed(1)}`).join(" ")}" fill="none" stroke="${s.color}" stroke-width="2.2" stroke-linejoin="round"/>`
+  ).join("");
+
+  const dots = series.map((s, si) =>
+    `<circle id="${id}-dot-${si}" cx="0" cy="0" r="4.5" fill="${s.color}" stroke="#fff" stroke-width="1.6" style="display:none"/>`
+  ).join("");
+
+  const zeroLine = yMin < 0 && yMax > 0 ? `<line x1="${margin.left}" x2="${margin.left + w}" y1="${y(0)}" y2="${y(0)}" stroke="#C7CCD6" stroke-width="1" stroke-dasharray="3,3"/>` : "";
+
+  const legend = showLegend ? `<div class="legend" id="${id}-legend">${series.map((s, si) =>
+    `<div class="legend-item" id="${id}-legend-${si}"><span class="legend-swatch" style="background:${s.color}"></span>${s.name}</div>`
+  ).join("")}</div>` : "";
+
+  const html = `<div class="chart-wrap" id="${id}-wrap">
+    <svg id="${id}-svg" viewBox="0 0 ${width} ${height}" width="100%" height="${height}">
+      <defs>${areaDef}</defs>
+      ${gridLines}${zeroLine}
+      <line x1="${margin.left}" x2="${margin.left + w}" y1="${margin.top + h}" y2="${margin.top + h}" stroke="#D5D9E0" stroke-width="1"/>
+      ${areaPath}
+      ${paths}
+      <line id="${id}-cursor" x1="0" x2="0" y1="${margin.top}" y2="${margin.top + h}" stroke="#9AA3B2" stroke-width="1" stroke-dasharray="3,3" style="opacity:0"/>
+      ${dots}
+      ${xTicksSvg}
+      <rect id="${id}-overlay" x="${margin.left}" y="${margin.top}" width="${w}" height="${h}" fill="transparent" style="cursor:crosshair"/>
+    </svg>
+    <div class="chart-tooltip" id="${id}-tooltip"></div>
+  </div>${legend}`;
+
+  afterRender(() => {
+    const svg = document.getElementById(id + "-svg");
+    const overlay = document.getElementById(id + "-overlay");
+    const cursor = document.getElementById(id + "-cursor");
+    const tooltip = document.getElementById(id + "-tooltip");
+    const visible = series.map(() => true);
+
+    series.forEach((s, si) => {
+      const legendItem = document.getElementById(id + "-legend-" + si);
+      if (legendItem) {
+        legendItem.addEventListener("click", () => {
+          visible[si] = !visible[si];
+          legendItem.classList.toggle("off", !visible[si]);
+          const path = document.getElementById(id + "-path-" + si);
+          if (path) path.style.display = visible[si] ? "" : "none";
+        });
+      }
+    });
+
+    if (overlay) {
+      overlay.addEventListener("mousemove", (e) => {
+        const rect = svg.getBoundingClientRect();
+        const scaleX = width / rect.width;
+        const pxX = e.clientX - rect.left;
+        const vbX = pxX * scaleX;
+        let idx = Math.round(scale(vbX, margin.left, margin.left + w, 0, n - 1));
+        idx = Math.max(0, Math.min(n - 1, idx));
+        const cx = x(idx);
+        cursor.setAttribute("x1", cx); cursor.setAttribute("x2", cx);
+        cursor.style.opacity = 1;
+
+        let rows = "";
+        series.forEach((s, si) => {
+          const dot = document.getElementById(id + "-dot-" + si);
+          if (!visible[si]) { if (dot) dot.style.display = "none"; return; }
+          const val = s.values[idx];
+          if (dot) { dot.setAttribute("cx", x(idx)); dot.setAttribute("cy", y(val)); dot.style.display = ""; }
+          rows += tooltipRow(s.color, s.name, yFormat(val));
+        });
+        tooltip.innerHTML = `<div class="tt-title">${xLabels ? xLabels[idx] : idx}</div>${rows}`;
+        tooltip.classList.add("show");
+        let left = pxX + 14;
+        if (left > rect.width - 170) left = pxX - 175;
+        tooltip.style.left = left + "px";
+        tooltip.style.top = Math.max(0, (e.clientY - rect.top) - 44) + "px";
+      });
+      overlay.addEventListener("mouseleave", () => {
+        cursor.style.opacity = 0;
+        series.forEach((s, si) => { const dot = document.getElementById(id + "-dot-" + si); if (dot) dot.style.display = "none"; });
+        tooltip.classList.remove("show");
+      });
+    }
+  });
+
+  return html;
+}
+
+// ============== Interactive grouped bar chart ==============
+function barChart(opts) {
+  const { width = 760, height = 320, categories, series, yFormat = (v) => v.toFixed(2), showLegend = true, negativeOk = false } = opts;
+  const id = nextId("bc");
+  const margin = { top: 16, right: 20, bottom: 34, left: 56 };
+  const w = width - margin.left - margin.right;
+  const h = height - margin.top - margin.bottom;
+
+  const allVals = series.flatMap((s) => s.values);
+  let yMin = negativeOk ? Math.min(0, ...allVals) : 0;
+  let yMax = Math.max(...allVals) * 1.18;
+
+  const y = (v) => margin.top + scale(v, yMax, yMin, 0, h);
+  const yTicks = niceTicks(yMin, yMax, 4);
+  const gridLines = yTicks.map((t) =>
+    `<line x1="${margin.left}" x2="${margin.left + w}" y1="${y(t)}" y2="${y(t)}" stroke="#E8EAEF" stroke-width="1"/>` +
+    `<text x="${margin.left - 8}" y="${y(t) + 4}" text-anchor="end" class="tooltip-svg-label">${yFormat(t)}</text>`
+  ).join("");
+
+  const catW = w / categories.length;
+  const groupPad = catW * 0.16;
+  const barW = (catW - groupPad * 2) / series.length;
+
+  const gradDefs = series.map((s, si) =>
+    `<linearGradient id="${id}-grad-${si}" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="${s.color}" stop-opacity="1"/>
+      <stop offset="100%" stop-color="${s.color}" stop-opacity="0.78"/>
+    </linearGradient>`
+  ).join("");
+
+  let bars = "";
+  series.forEach((s, si) => {
+    bars += `<g id="${id}-series-${si}">`;
+    categories.forEach((cat, ci) => {
+      const v = s.values[ci];
+      const bx = margin.left + ci * catW + groupPad + si * barW;
+      const by = Math.min(y(0), y(v));
+      const bh = Math.max(Math.abs(y(v) - y(0)), 1);
+      bars += `<rect id="${id}-bar-${si}-${ci}" class="hover-target" x="${bx.toFixed(1)}" y="${by.toFixed(1)}" width="${(barW - 2).toFixed(1)}" height="${bh.toFixed(1)}" fill="url(#${id}-grad-${si})" rx="3"/>`;
+    });
+    bars += `</g>`;
+  });
+  const catLabels = categories.map((cat, ci) =>
+    `<text x="${(margin.left + ci * catW + catW / 2).toFixed(1)}" y="${margin.top + h + 20}" text-anchor="middle" class="tooltip-svg-label">${cat}</text>`
+  ).join("");
+
+  const legend = showLegend ? `<div class="legend" id="${id}-legend">${series.map((s, si) =>
+    `<div class="legend-item" id="${id}-legend-${si}"><span class="legend-swatch" style="background:${s.color}"></span>${s.name}</div>`
+  ).join("")}</div>` : "";
+
+  const html = `<div class="chart-wrap" id="${id}-wrap">
+    <svg id="${id}-svg" viewBox="0 0 ${width} ${height}" width="100%" height="${height}">
+      <defs>${gradDefs}</defs>
+      ${gridLines}
+      <line x1="${margin.left}" x2="${margin.left + w}" y1="${y(0)}" y2="${y(0)}" stroke="#D5D9E0" stroke-width="1"/>
+      ${bars}${catLabels}
+    </svg>
+    <div class="chart-tooltip" id="${id}-tooltip"></div>
+  </div>${legend}`;
+
+  afterRender(() => {
+    const svg = document.getElementById(id + "-svg");
+    const tooltip = document.getElementById(id + "-tooltip");
+    const visible = series.map(() => true);
+
+    series.forEach((s, si) => {
+      const legendItem = document.getElementById(id + "-legend-" + si);
+      if (legendItem) {
+        legendItem.addEventListener("click", () => {
+          visible[si] = !visible[si];
+          legendItem.classList.toggle("off", !visible[si]);
+          const g = document.getElementById(id + "-series-" + si);
+          if (g) g.style.display = visible[si] ? "" : "none";
+        });
+      }
+      categories.forEach((cat, ci) => {
+        const rect = document.getElementById(id + "-bar-" + si + "-" + ci);
+        if (!rect) return;
+        rect.addEventListener("mousemove", (e) => {
+          const svgRect = svg.getBoundingClientRect();
+          const pxX = e.clientX - svgRect.left, pxY = e.clientY - svgRect.top;
+          tooltip.innerHTML = `<div class="tt-title">${cat}</div>${tooltipRow(s.color, s.name, yFormat(s.values[ci]))}`;
+          tooltip.classList.add("show");
+          let left = pxX + 14;
+          if (left > svgRect.width - 170) left = pxX - 175;
+          tooltip.style.left = left + "px";
+          tooltip.style.top = Math.max(0, pxY - 44) + "px";
+          rect.setAttribute("opacity", "0.82");
+        });
+        rect.addEventListener("mouseleave", () => {
+          tooltip.classList.remove("show");
+          rect.setAttribute("opacity", "1");
+        });
+      });
+    });
+  });
+
+  return html;
+}
+
+// ============== Interactive correlation heatmap ==============
+function heatmap(matrix, labels) {
+  const id = nextId("hm");
+  const cell = 60;
+  const margin = { top: 8, left: 46 };
+  const size = labels.length;
+  const width = margin.left + cell * size + 10;
+  const height = margin.top + cell * size + 30;
+
+  function hexToRgb(h) { const n = parseInt(h.slice(1), 16); return [(n >> 16) & 255, (n >> 8) & 255, n & 255]; }
+  function mixColor(c1, c2, t) {
+    const p1 = hexToRgb(c1), p2 = hexToRgb(c2);
+    return `rgb(${Math.round(p1[0] + (p2[0] - p1[0]) * t)},${Math.round(p1[1] + (p2[1] - p1[1]) * t)},${Math.round(p1[2] + (p2[2] - p1[2]) * t)})`;
+  }
+  function colorFor(v) { return v >= 0 ? mixColor("#F0F2F7", "#E8A200", v) : mixColor("#F0F2F7", "#E1584C", -v); }
+
+  let cells = "", rowLabelSvg = "", colLabelSvg = "";
+  labels.forEach((rowLabel, ri) => {
+    rowLabelSvg += `<text id="${id}-rl-${ri}" x="${margin.left - 8}" y="${margin.top + ri * cell + cell / 2 + 4}" text-anchor="end" class="tooltip-svg-label">${rowLabel}</text>`;
+    labels.forEach((colLabel, ci) => {
+      const v = matrix[rowLabel][colLabel];
+      const cx = margin.left + ci * cell, cy = margin.top + ri * cell;
+      const textColor = Math.abs(v) > 0.55 ? "#151E2B" : "#151E2B";
+      cells += `<rect id="${id}-c-${ri}-${ci}" class="hover-target" x="${cx}" y="${cy}" width="${cell - 3}" height="${cell - 3}" fill="${colorFor(v)}" rx="4"/>`;
+      cells += `<text x="${cx + (cell - 3) / 2}" y="${cy + (cell - 3) / 2 + 4}" text-anchor="middle" font-size="12" fill="${textColor}" style="pointer-events:none">${v.toFixed(2)}</text>`;
+    });
+  });
+  labels.forEach((colLabel, ci) => {
+    colLabelSvg += `<text id="${id}-cl-${ci}" x="${margin.left + ci * cell + (cell - 3) / 2}" y="${margin.top + cell * size + 18}" text-anchor="middle" class="tooltip-svg-label">${colLabel}</text>`;
+  });
+
+  const html = `<div class="chart-wrap" id="${id}-wrap">
+    <svg id="${id}-svg" viewBox="0 0 ${width} ${height}" width="100%" height="${height}">${cells}${rowLabelSvg}${colLabelSvg}</svg>
+    <div class="chart-tooltip" id="${id}-tooltip"></div>
+  </div>`;
+
+  afterRender(() => {
+    const svg = document.getElementById(id + "-svg");
+    const tooltip = document.getElementById(id + "-tooltip");
+    labels.forEach((rowLabel, ri) => {
+      labels.forEach((colLabel, ci) => {
+        const rect = document.getElementById(id + "-c-" + ri + "-" + ci);
+        if (!rect) return;
+        rect.addEventListener("mousemove", (e) => {
+          const svgRect = svg.getBoundingClientRect();
+          const pxX = e.clientX - svgRect.left, pxY = e.clientY - svgRect.top;
+          const v = matrix[rowLabel][colLabel];
+          tooltip.innerHTML = `<div class="tt-title">${rowLabel} &harr; ${colLabel}</div>${tooltipRow(v >= 0 ? "#E8A200" : "#E1584C", "Correlation", v.toFixed(3))}`;
+          tooltip.classList.add("show");
+          let left = pxX + 14;
+          if (left > svgRect.width - 170) left = pxX - 175;
+          tooltip.style.left = left + "px"; tooltip.style.top = Math.max(0, pxY - 40) + "px";
+          document.getElementById(id + "-rl-" + ri).setAttribute("font-weight", "700");
+          document.getElementById(id + "-cl-" + ci).setAttribute("font-weight", "700");
+          rect.setAttribute("stroke", "#151E2B"); rect.setAttribute("stroke-width", "1.5");
+        });
+        rect.addEventListener("mouseleave", () => {
+          tooltip.classList.remove("show");
+          document.getElementById(id + "-rl-" + ri).setAttribute("font-weight", "400");
+          document.getElementById(id + "-cl-" + ci).setAttribute("font-weight", "400");
+          rect.removeAttribute("stroke"); rect.removeAttribute("stroke-width");
+        });
+      });
+    });
+  });
+
+  return html;
+}
+
+// ============== Interactive efficient frontier ==============
+function frontierChart(opts) {
+  const { width = 640, height = 400, frontier, points } = opts;
+  const id = nextId("fc");
+  const margin = { top: 20, right: 30, bottom: 46, left: 62 };
+  const w = width - margin.left - margin.right;
+  const h = height - margin.top - margin.bottom;
+
+  const allX = frontier.map((f) => f.vol).concat(points.map((p) => p.vol));
+  const allY = frontier.map((f) => f.ret).concat(points.map((p) => p.ret));
+  const xMin = Math.min(...allX) * 0.9, xMax = Math.max(...allX) * 1.08;
+  const yMin = Math.min(...allY) * 0.85, yMax = Math.max(...allY) * 1.1;
+
+  const x = (v) => margin.left + scale(v, xMin, xMax, 0, w);
+  const y = (v) => margin.top + scale(v, yMax, yMin, 0, h);
+
+  const xTicks = niceTicks(xMin, xMax, 4), yTicks = niceTicks(yMin, yMax, 4);
+  let grid = "";
+  xTicks.forEach((t) => { grid += `<line x1="${x(t)}" x2="${x(t)}" y1="${margin.top}" y2="${margin.top + h}" stroke="#E8EAEF"/><text x="${x(t)}" y="${margin.top + h + 20}" text-anchor="middle" class="tooltip-svg-label">${(t * 100).toFixed(1)}%</text>`; });
+  yTicks.forEach((t) => { grid += `<line x1="${margin.left}" x2="${margin.left + w}" y1="${y(t)}" y2="${y(t)}" stroke="#E8EAEF"/><text x="${margin.left - 8}" y="${y(t) + 4}" text-anchor="end" class="tooltip-svg-label">${(t * 100).toFixed(2)}%</text>`; });
+
+  const frontierPath = frontier.map((f, i) => `${i === 0 ? "M" : "L"} ${x(f.vol).toFixed(1)} ${y(f.ret).toFixed(1)}`).join(" ");
+  const markers = points.map((p, pi) =>
+    `<circle id="${id}-pt-${pi}" class="hover-target" cx="${x(p.vol).toFixed(1)}" cy="${y(p.ret).toFixed(1)}" r="7" fill="${p.color}" stroke="#fff" stroke-width="2"/>` +
+    `<text x="${x(p.vol) + 12}" y="${y(p.ret) + 4}" font-size="11.5" font-weight="600" fill="${p.color}" style="pointer-events:none">${p.name}</text>`
+  ).join("");
+
+  const html = `<div class="chart-wrap" id="${id}-wrap">
+    <svg id="${id}-svg" viewBox="0 0 ${width} ${height}" width="100%" height="${height}">
+      ${grid}
+      <path d="${frontierPath}" fill="none" stroke="#1D8FA6" stroke-width="2"/>
+      ${markers}
+      <text x="${margin.left + w / 2}" y="${height - 6}" text-anchor="middle" class="tooltip-svg-label">Weekly volatility (risk) &#8594;</text>
+    </svg>
+    <div class="chart-tooltip" id="${id}-tooltip"></div>
+  </div>`;
+
+  afterRender(() => {
+    const svg = document.getElementById(id + "-svg");
+    const tooltip = document.getElementById(id + "-tooltip");
+    points.forEach((p, pi) => {
+      const el = document.getElementById(id + "-pt-" + pi);
+      if (!el) return;
+      el.addEventListener("mousemove", (e) => {
+        const svgRect = svg.getBoundingClientRect();
+        const pxX = e.clientX - svgRect.left, pxY = e.clientY - svgRect.top;
+        tooltip.innerHTML = `<div class="tt-title">${p.name}</div>` +
+          tooltipRow(p.color, "Return", (p.ret * 100).toFixed(2) + "% / wk") +
+          tooltipRow(p.color, "Volatility", (p.vol * 100).toFixed(2) + "% / wk") +
+          tooltipRow(p.color, "Sharpe", p.sharpe.toFixed(3));
+        tooltip.classList.add("show");
+        let left = pxX + 16;
+        if (left > svgRect.width - 170) left = pxX - 175;
+        tooltip.style.left = left + "px"; tooltip.style.top = Math.max(0, pxY - 50) + "px";
+        el.setAttribute("r", "9.5");
+      });
+      el.addEventListener("mouseleave", () => { tooltip.classList.remove("show"); el.setAttribute("r", "7"); });
+    });
+  });
+
+  return html;
+}
+
+</script>
+<script>
+const DATA = {"priceSeries": {"AMZN": [{"date": "2020-03-20", "close": 92.3}, {"date": "2020-03-27", "close": 95.01}, {"date": "2020-04-03", "close": 95.33}, {"date": "2020-04-10", "close": 102.14}, {"date": "2020-04-17", "close": 118.75}, {"date": "2020-04-24", "close": 120.51}, {"date": "2020-05-01", "close": 114.3}, {"date": "2020-05-08", "close": 118.98}, {"date": "2020-05-15", "close": 120.49}, {"date": "2020-05-22", "close": 121.84}, {"date": "2020-05-29", "close": 122.12}, {"date": "2020-06-05", "close": 124.15}, {"date": "2020-06-12", "close": 127.25}, {"date": "2020-06-19", "close": 133.75}, {"date": "2020-06-26", "close": 134.64}, {"date": "2020-07-03", "close": 144.52}, {"date": "2020-07-10", "close": 160.0}, {"date": "2020-07-17", "close": 148.1}, {"date": "2020-07-24", "close": 150.45}, {"date": "2020-07-31", "close": 158.23}, {"date": "2020-08-07", "close": 158.37}, {"date": "2020-08-14", "close": 157.4}, {"date": "2020-08-21", "close": 164.24}, {"date": "2020-08-28", "close": 170.09}, {"date": "2020-09-04", "close": 164.73}, {"date": "2020-09-11", "close": 155.81}, {"date": "2020-09-18", "close": 147.75}, {"date": "2020-09-25", "close": 154.76}, {"date": "2020-10-02", "close": 156.25}, {"date": "2020-10-09", "close": 164.33}, {"date": "2020-10-16", "close": 163.64}, {"date": "2020-10-23", "close": 160.22}, {"date": "2020-10-30", "close": 151.81}, {"date": "2020-11-06", "close": 165.57}, {"date": "2020-11-13", "close": 156.44}, {"date": "2020-11-20", "close": 154.97}, {"date": "2020-11-27", "close": 159.77}, {"date": "2020-12-04", "close": 158.13}, {"date": "2020-12-11", "close": 155.82}, {"date": "2020-12-18", "close": 160.08}, {"date": "2020-12-25", "close": 158.63}, {"date": "2021-01-01", "close": 162.85}, {"date": "2021-01-08", "close": 159.14}, {"date": "2021-01-15", "close": 155.21}, {"date": "2021-01-22", "close": 164.61}, {"date": "2021-01-29", "close": 160.31}, {"date": "2021-02-05", "close": 167.61}, {"date": "2021-02-12", "close": 163.89}, {"date": "2021-02-19", "close": 162.5}, {"date": "2021-02-26", "close": 154.65}, {"date": "2021-03-05", "close": 150.02}, {"date": "2021-03-12", "close": 154.47}, {"date": "2021-03-19", "close": 153.75}, {"date": "2021-03-26", "close": 152.6}, {"date": "2021-04-02", "close": 158.05}, {"date": "2021-04-09", "close": 168.61}, {"date": "2021-04-16", "close": 169.97}, {"date": "2021-04-23", "close": 167.04}, {"date": "2021-04-30", "close": 173.37}, {"date": "2021-05-07", "close": 164.58}, {"date": "2021-05-14", "close": 161.15}, {"date": "2021-05-21", "close": 160.15}, {"date": "2021-05-28", "close": 161.15}, {"date": "2021-06-04", "close": 160.31}, {"date": "2021-06-11", "close": 167.34}, {"date": "2021-06-18", "close": 174.35}, {"date": "2021-06-25", "close": 170.07}, {"date": "2021-07-02", "close": 175.55}, {"date": "2021-07-09", "close": 185.97}, {"date": "2021-07-16", "close": 178.68}, {"date": "2021-07-23", "close": 182.83}, {"date": "2021-07-30", "close": 166.38}, {"date": "2021-08-06", "close": 167.25}, {"date": "2021-08-13", "close": 164.7}, {"date": "2021-08-20", "close": 160.0}, {"date": "2021-08-27", "close": 167.48}, {"date": "2021-09-03", "close": 173.9}, {"date": "2021-09-10", "close": 173.46}, {"date": "2021-09-17", "close": 173.13}, {"date": "2021-09-24", "close": 171.28}, {"date": "2021-10-01", "close": 164.16}, {"date": "2021-10-08", "close": 164.43}, {"date": "2021-10-15", "close": 170.45}, {"date": "2021-10-22", "close": 166.78}, {"date": "2021-10-29", "close": 168.62}, {"date": "2021-11-05", "close": 175.95}, {"date": "2021-11-12", "close": 176.26}, {"date": "2021-11-19", "close": 183.83}, {"date": "2021-11-26", "close": 175.23}, {"date": "2021-12-03", "close": 169.49}, {"date": "2021-12-10", "close": 172.21}, {"date": "2021-12-17", "close": 170.02}, {"date": "2021-12-24", "close": 171.07}, {"date": "2021-12-31", "close": 166.72}, {"date": "2022-01-07", "close": 162.55}, {"date": "2022-01-14", "close": 162.14}, {"date": "2022-01-21", "close": 142.64}, {"date": "2022-01-28", "close": 143.98}, {"date": "2022-02-04", "close": 157.64}, {"date": "2022-02-11", "close": 153.29}, {"date": "2022-02-18", "close": 152.6}, {"date": "2022-02-25", "close": 153.79}, {"date": "2022-03-04", "close": 145.64}, {"date": "2022-03-11", "close": 145.52}, {"date": "2022-03-18", "close": 161.25}, {"date": "2022-03-25", "close": 164.77}, {"date": "2022-04-01", "close": 163.56}, {"date": "2022-04-08", "close": 154.46}, {"date": "2022-04-15", "close": 151.71}, {"date": "2022-04-22", "close": 144.35}, {"date": "2022-04-29", "close": 124.28}, {"date": "2022-05-06", "close": 114.77}, {"date": "2022-05-13", "close": 113.06}, {"date": "2022-05-20", "close": 107.59}, {"date": "2022-05-27", "close": 115.15}, {"date": "2022-06-03", "close": 122.35}, {"date": "2022-06-10", "close": 109.65}, {"date": "2022-06-17", "close": 106.22}, {"date": "2022-06-24", "close": 116.46}, {"date": "2022-07-01", "close": 109.56}, {"date": "2022-07-08", "close": 115.54}, {"date": "2022-07-15", "close": 113.55}, {"date": "2022-07-22", "close": 122.42}, {"date": "2022-07-29", "close": 134.95}, {"date": "2022-08-05", "close": 140.8}, {"date": "2022-08-12", "close": 143.55}, {"date": "2022-08-19", "close": 138.23}, {"date": "2022-08-26", "close": 130.75}, {"date": "2022-09-02", "close": 127.51}, {"date": "2022-09-09", "close": 133.27}, {"date": "2022-09-16", "close": 123.53}, {"date": "2022-09-23", "close": 113.78}, {"date": "2022-09-30", "close": 113.0}, {"date": "2022-10-07", "close": 114.56}, {"date": "2022-10-14", "close": 106.9}, {"date": "2022-10-21", "close": 119.32}, {"date": "2022-10-28", "close": 103.41}, {"date": "2022-11-04", "close": 90.98}, {"date": "2022-11-11", "close": 100.79}, {"date": "2022-11-18", "close": 94.14}, {"date": "2022-11-25", "close": 93.41}, {"date": "2022-12-02", "close": 94.13}, {"date": "2022-12-09", "close": 89.09}, {"date": "2022-12-16", "close": 87.86}, {"date": "2022-12-23", "close": 85.25}, {"date": "2022-12-30", "close": 84.0}, {"date": "2023-01-06", "close": 86.08}, {"date": "2023-01-13", "close": 98.12}, {"date": "2023-01-20", "close": 97.25}, {"date": "2023-01-27", "close": 102.24}, {"date": "2023-02-03", "close": 103.39}, {"date": "2023-02-10", "close": 97.61}, {"date": "2023-02-17", "close": 97.2}, {"date": "2023-02-24", "close": 93.5}, {"date": "2023-03-03", "close": 94.9}, {"date": "2023-03-10", "close": 90.73}, {"date": "2023-03-17", "close": 98.95}, {"date": "2023-03-24", "close": 98.13}, {"date": "2023-03-31", "close": 103.29}, {"date": "2023-04-07", "close": 102.06}, {"date": "2023-04-14", "close": 102.51}, {"date": "2023-04-21", "close": 106.96}, {"date": "2023-04-28", "close": 105.45}, {"date": "2023-05-05", "close": 105.66}, {"date": "2023-05-12", "close": 110.26}, {"date": "2023-05-19", "close": 116.25}, {"date": "2023-05-26", "close": 120.11}, {"date": "2023-06-02", "close": 124.25}, {"date": "2023-06-09", "close": 123.43}, {"date": "2023-06-16", "close": 125.49}, {"date": "2023-06-23", "close": 129.33}, {"date": "2023-06-30", "close": 130.36}, {"date": "2023-07-07", "close": 129.78}, {"date": "2023-07-14", "close": 134.68}, {"date": "2023-07-21", "close": 130.0}, {"date": "2023-07-28", "close": 132.21}, {"date": "2023-08-04", "close": 139.57}, {"date": "2023-08-11", "close": 138.41}, {"date": "2023-08-18", "close": 133.22}, {"date": "2023-08-25", "close": 133.26}, {"date": "2023-09-01", "close": 138.12}, {"date": "2023-09-08", "close": 138.23}, {"date": "2023-09-15", "close": 140.39}, {"date": "2023-09-22", "close": 129.12}, {"date": "2023-09-29", "close": 127.12}, {"date": "2023-10-06", "close": 127.96}, {"date": "2023-10-13", "close": 129.79}, {"date": "2023-10-20", "close": 125.17}, {"date": "2023-10-27", "close": 127.74}, {"date": "2023-11-03", "close": 138.6}, {"date": "2023-11-10", "close": 143.56}, {"date": "2023-11-17", "close": 145.18}, {"date": "2023-11-24", "close": 146.74}, {"date": "2023-12-01", "close": 147.03}, {"date": "2023-12-08", "close": 147.42}, {"date": "2023-12-15", "close": 149.97}, {"date": "2023-12-22", "close": 153.42}, {"date": "2023-12-29", "close": 151.94}, {"date": "2024-01-05", "close": 145.24}, {"date": "2024-01-12", "close": 154.62}, {"date": "2024-01-19", "close": 155.34}, {"date": "2024-01-26", "close": 159.12}, {"date": "2024-02-02", "close": 171.81}, {"date": "2024-02-09", "close": 174.45}, {"date": "2024-02-16", "close": 169.51}, {"date": "2024-02-23", "close": 174.99}, {"date": "2024-03-01", "close": 178.22}, {"date": "2024-03-08", "close": 175.35}, {"date": "2024-03-15", "close": 174.42}, {"date": "2024-03-22", "close": 178.87}, {"date": "2024-03-29", "close": 180.38}, {"date": "2024-04-05", "close": 185.07}, {"date": "2024-04-12", "close": 186.13}, {"date": "2024-04-19", "close": 174.63}, {"date": "2024-04-26", "close": 179.62}, {"date": "2024-05-03", "close": 186.21}, {"date": "2024-05-10", "close": 187.48}, {"date": "2024-05-17", "close": 184.7}, {"date": "2024-05-24", "close": 180.75}, {"date": "2024-05-31", "close": 176.44}, {"date": "2024-06-07", "close": 184.3}, {"date": "2024-06-14", "close": 183.66}, {"date": "2024-06-21", "close": 189.08}, {"date": "2024-06-28", "close": 193.25}, {"date": "2024-07-05", "close": 200.0}, {"date": "2024-07-12", "close": 194.49}, {"date": "2024-07-19", "close": 183.13}, {"date": "2024-07-26", "close": 182.5}, {"date": "2024-08-02", "close": 167.9}, {"date": "2024-08-09", "close": 166.94}, {"date": "2024-08-16", "close": 177.06}, {"date": "2024-08-23", "close": 177.04}, {"date": "2024-08-30", "close": 178.5}, {"date": "2024-09-06", "close": 171.39}, {"date": "2024-09-13", "close": 186.49}, {"date": "2024-09-20", "close": 191.6}, {"date": "2024-09-27", "close": 187.97}, {"date": "2024-10-04", "close": 186.51}, {"date": "2024-10-11", "close": 188.82}, {"date": "2024-10-18", "close": 188.99}, {"date": "2024-10-25", "close": 187.83}, {"date": "2024-11-01", "close": 197.93}, {"date": "2024-11-08", "close": 208.18}, {"date": "2024-11-15", "close": 202.61}, {"date": "2024-11-22", "close": 197.12}, {"date": "2024-11-29", "close": 207.89}, {"date": "2024-12-06", "close": 227.03}, {"date": "2024-12-13", "close": 227.46}, {"date": "2024-12-20", "close": 224.92}, {"date": "2024-12-27", "close": 223.75}], "JNJ": [{"date": "2020-03-20", "close": 102.87}, {"date": "2020-03-27", "close": 105.68}, {"date": "2020-04-03", "close": 115.13}, {"date": "2020-04-10", "close": 121.19}, {"date": "2020-04-17", "close": 130.44}, {"date": "2020-04-24", "close": 132.88}, {"date": "2020-05-01", "close": 127.24}, {"date": "2020-05-08", "close": 127.59}, {"date": "2020-05-15", "close": 129.09}, {"date": "2020-05-22", "close": 123.88}, {"date": "2020-05-29", "close": 127.64}, {"date": "2020-06-05", "close": 126.39}, {"date": "2020-06-12", "close": 121.97}, {"date": "2020-06-19", "close": 123.42}, {"date": "2020-06-26", "close": 118.25}, {"date": "2020-07-03", "close": 120.96}, {"date": "2020-07-10", "close": 122.16}, {"date": "2020-07-17", "close": 128.15}, {"date": "2020-07-24", "close": 127.1}, {"date": "2020-07-31", "close": 125.07}, {"date": "2020-08-07", "close": 127.51}, {"date": "2020-08-14", "close": 127.2}, {"date": "2020-08-21", "close": 131.08}, {"date": "2020-08-28", "close": 131.83}, {"date": "2020-09-04", "close": 127.5}, {"date": "2020-09-11", "close": 126.81}, {"date": "2020-09-18", "close": 128.01}, {"date": "2020-09-25", "close": 124.99}, {"date": "2020-10-02", "close": 125.48}, {"date": "2020-10-09", "close": 129.54}, {"date": "2020-10-16", "close": 127.08}, {"date": "2020-10-23", "close": 124.63}, {"date": "2020-10-30", "close": 117.65}, {"date": "2020-11-06", "close": 122.06}, {"date": "2020-11-13", "close": 128.62}, {"date": "2020-11-20", "close": 125.59}, {"date": "2020-11-27", "close": 123.56}, {"date": "2020-12-04", "close": 128.94}, {"date": "2020-12-11", "close": 131.24}, {"date": "2020-12-18", "close": 132.58}, {"date": "2020-12-25", "close": 130.83}, {"date": "2021-01-01", "close": 135.04}, {"date": "2021-01-08", "close": 137.33}, {"date": "2021-01-15", "close": 137.55}, {"date": "2021-01-22", "close": 140.34}, {"date": "2021-01-29", "close": 139.98}, {"date": "2021-02-05", "close": 141.11}, {"date": "2021-02-12", "close": 142.94}, {"date": "2021-02-19", "close": 139.85}, {"date": "2021-02-26", "close": 136.82}, {"date": "2021-03-05", "close": 134.78}, {"date": "2021-03-12", "close": 137.8}, {"date": "2021-03-19", "close": 138.18}, {"date": "2021-03-26", "close": 142.4}, {"date": "2021-04-02", "close": 140.59}, {"date": "2021-04-09", "close": 139.23}, {"date": "2021-04-16", "close": 140.08}, {"date": "2021-04-23", "close": 142.91}, {"date": "2021-04-30", "close": 140.5}, {"date": "2021-05-07", "close": 145.49}, {"date": "2021-05-14", "close": 146.97}, {"date": "2021-05-21", "close": 147.61}, {"date": "2021-05-28", "close": 147.05}, {"date": "2021-06-04", "close": 144.2}, {"date": "2021-06-11", "close": 143.32}, {"date": "2021-06-18", "close": 140.73}, {"date": "2021-06-25", "close": 142.67}, {"date": "2021-07-02", "close": 146.81}, {"date": "2021-07-09", "close": 147.48}, {"date": "2021-07-16", "close": 146.05}, {"date": "2021-07-23", "close": 149.25}, {"date": "2021-07-30", "close": 149.61}, {"date": "2021-08-06", "close": 150.4}, {"date": "2021-08-13", "close": 153.13}, {"date": "2021-08-20", "close": 155.9}, {"date": "2021-08-27", "close": 151.14}, {"date": "2021-09-03", "close": 152.98}, {"date": "2021-09-10", "close": 145.93}, {"date": "2021-09-17", "close": 143.99}, {"date": "2021-09-24", "close": 143.65}, {"date": "2021-10-01", "close": 140.25}, {"date": "2021-10-08", "close": 140.65}, {"date": "2021-10-15", "close": 140.97}, {"date": "2021-10-22", "close": 143.09}, {"date": "2021-10-29", "close": 142.35}, {"date": "2021-11-05", "close": 142.83}, {"date": "2021-11-12", "close": 144.21}, {"date": "2021-11-19", "close": 142.36}, {"date": "2021-11-26", "close": 140.05}, {"date": "2021-12-03", "close": 140.21}, {"date": "2021-12-10", "close": 145.58}, {"date": "2021-12-17", "close": 147.99}, {"date": "2021-12-24", "close": 148.01}, {"date": "2021-12-31", "close": 150.49}, {"date": "2022-01-07", "close": 153.02}, {"date": "2022-01-14", "close": 147.65}, {"date": "2022-01-21", "close": 145.03}, {"date": "2022-01-28", "close": 151.12}, {"date": "2022-02-04", "close": 150.98}, {"date": "2022-02-11", "close": 147.53}, {"date": "2022-02-18", "close": 144.63}, {"date": "2022-02-25", "close": 146.97}, {"date": "2022-03-04", "close": 150.05}, {"date": "2022-03-11", "close": 149.93}, {"date": "2022-03-18", "close": 154.79}, {"date": "2022-03-25", "close": 156.63}, {"date": "2022-04-01", "close": 157.76}, {"date": "2022-04-08", "close": 161.24}, {"date": "2022-04-15", "close": 159.27}, {"date": "2022-04-22", "close": 160.72}, {"date": "2022-04-29", "close": 159.77}, {"date": "2022-05-06", "close": 156.15}, {"date": "2022-05-13", "close": 156.57}, {"date": "2022-05-20", "close": 156.69}, {"date": "2022-05-27", "close": 161.36}, {"date": "2022-06-03", "close": 157.2}, {"date": "2022-06-10", "close": 153.75}, {"date": "2022-06-17", "close": 150.99}, {"date": "2022-06-24", "close": 162.43}, {"date": "2022-07-01", "close": 159.96}, {"date": "2022-07-08", "close": 158.85}, {"date": "2022-07-15", "close": 158.81}, {"date": "2022-07-22", "close": 153.36}, {"date": "2022-07-29", "close": 155.5}, {"date": "2022-08-05", "close": 152.46}, {"date": "2022-08-12", "close": 147.29}, {"date": "2022-08-19", "close": 150.86}, {"date": "2022-08-26", "close": 147.35}, {"date": "2022-09-02", "close": 145.98}, {"date": "2022-09-09", "close": 148.64}, {"date": "2022-09-16", "close": 150.34}, {"date": "2022-09-23", "close": 149.55}, {"date": "2022-09-30", "close": 146.54}, {"date": "2022-10-07", "close": 143.7}, {"date": "2022-10-14", "close": 147.52}, {"date": "2022-10-21", "close": 151.34}, {"date": "2022-10-28", "close": 156.86}, {"date": "2022-11-04", "close": 153.82}, {"date": "2022-11-11", "close": 151.82}, {"date": "2022-11-18", "close": 158.05}, {"date": "2022-11-25", "close": 160.01}, {"date": "2022-12-02", "close": 161.49}, {"date": "2022-12-09", "close": 158.66}, {"date": "2022-12-16", "close": 158.6}, {"date": "2022-12-23", "close": 160.23}, {"date": "2022-12-30", "close": 159.48}, {"date": "2023-01-06", "close": 162.73}, {"date": "2023-01-13", "close": 156.57}, {"date": "2023-01-20", "close": 152.34}, {"date": "2023-01-27", "close": 151.88}, {"date": "2023-02-03", "close": 148.61}, {"date": "2023-02-10", "close": 146.39}, {"date": "2023-02-17", "close": 145.84}, {"date": "2023-02-24", "close": 141.82}, {"date": "2023-03-03", "close": 140.05}, {"date": "2023-03-10", "close": 137.86}, {"date": "2023-03-17", "close": 138.56}, {"date": "2023-03-24", "close": 138.8}, {"date": "2023-03-31", "close": 140.94}, {"date": "2023-04-07", "close": 150.17}, {"date": "2023-04-14", "close": 150.8}, {"date": "2023-04-21", "close": 147.93}, {"date": "2023-04-28", "close": 148.85}, {"date": "2023-05-05", "close": 147.92}, {"date": "2023-05-12", "close": 146.2}, {"date": "2023-05-19", "close": 144.5}, {"date": "2023-05-26", "close": 141.41}, {"date": "2023-06-02", "close": 143.81}, {"date": "2023-06-09", "close": 146.59}, {"date": "2023-06-16", "close": 150.46}, {"date": "2023-06-23", "close": 151.61}, {"date": "2023-06-30", "close": 151.64}, {"date": "2023-07-07", "close": 145.9}, {"date": "2023-07-14", "close": 146.47}, {"date": "2023-07-21", "close": 155.92}, {"date": "2023-07-28", "close": 159.85}, {"date": "2023-08-04", "close": 154.87}, {"date": "2023-08-11", "close": 159.27}, {"date": "2023-08-18", "close": 158.03}, {"date": "2023-08-25", "close": 153.42}, {"date": "2023-09-01", "close": 148.09}, {"date": "2023-09-08", "close": 148.17}, {"date": "2023-09-15", "close": 148.99}, {"date": "2023-09-22", "close": 148.11}, {"date": "2023-09-29", "close": 143.73}, {"date": "2023-10-06", "close": 145.47}, {"date": "2023-10-13", "close": 144.74}, {"date": "2023-10-20", "close": 141.19}, {"date": "2023-10-27", "close": 134.36}, {"date": "2023-11-03", "close": 139.66}, {"date": "2023-11-10", "close": 135.88}, {"date": "2023-11-17", "close": 138.23}, {"date": "2023-11-24", "close": 141.86}, {"date": "2023-12-01", "close": 147.33}, {"date": "2023-12-08", "close": 143.64}, {"date": "2023-12-15", "close": 144.33}, {"date": "2023-12-22", "close": 144.61}, {"date": "2023-12-29", "close": 145.8}, {"date": "2024-01-05", "close": 149.88}, {"date": "2024-01-12", "close": 151.06}, {"date": "2024-01-19", "close": 150.39}, {"date": "2024-01-26", "close": 148.37}, {"date": "2024-02-02", "close": 145.68}, {"date": "2024-02-09", "close": 145.82}, {"date": "2024-02-16", "close": 146.73}, {"date": "2024-02-23", "close": 151.69}, {"date": "2024-03-01", "close": 151.95}, {"date": "2024-03-08", "close": 149.51}, {"date": "2024-03-15", "close": 148.26}, {"date": "2024-03-22", "close": 145.49}, {"date": "2024-03-29", "close": 148.27}, {"date": "2024-04-05", "close": 142.83}, {"date": "2024-04-12", "close": 138.26}, {"date": "2024-04-19", "close": 138.63}, {"date": "2024-04-26", "close": 136.97}, {"date": "2024-05-03", "close": 139.91}, {"date": "2024-05-10", "close": 140.51}, {"date": "2024-05-17", "close": 144.94}, {"date": "2024-05-24", "close": 138.86}, {"date": "2024-05-31", "close": 138.58}, {"date": "2024-06-07", "close": 138.97}, {"date": "2024-06-14", "close": 137.51}, {"date": "2024-06-21", "close": 140.54}, {"date": "2024-06-28", "close": 138.1}, {"date": "2024-07-05", "close": 138.4}, {"date": "2024-07-12", "close": 141.61}, {"date": "2024-07-19", "close": 146.16}, {"date": "2024-07-26", "close": 151.78}, {"date": "2024-08-02", "close": 155.09}, {"date": "2024-08-09", "close": 151.76}, {"date": "2024-08-16", "close": 150.6}, {"date": "2024-08-23", "close": 155.08}, {"date": "2024-08-30", "close": 157.9}, {"date": "2024-09-06", "close": 156.49}, {"date": "2024-09-13", "close": 157.58}, {"date": "2024-09-20", "close": 156.28}, {"date": "2024-09-27", "close": 153.65}, {"date": "2024-10-04", "close": 152.6}, {"date": "2024-10-11", "close": 153.71}, {"date": "2024-10-18", "close": 157.2}, {"date": "2024-10-25", "close": 153.16}, {"date": "2024-11-01", "close": 152.45}, {"date": "2024-11-08", "close": 148.01}, {"date": "2024-11-15", "close": 146.61}, {"date": "2024-11-22", "close": 147.72}, {"date": "2024-11-29", "close": 148.76}, {"date": "2024-12-06", "close": 143.29}, {"date": "2024-12-13", "close": 140.7}, {"date": "2024-12-20", "close": 138.64}, {"date": "2024-12-27", "close": 139.2}], "JPM": [{"date": "2020-03-20", "close": 74.55}, {"date": "2020-03-27", "close": 76.64}, {"date": "2020-04-03", "close": 71.42}, {"date": "2020-04-10", "close": 84.41}, {"date": "2020-04-17", "close": 80.88}, {"date": "2020-04-24", "close": 77.08}, {"date": "2020-05-01", "close": 79.24}, {"date": "2020-05-08", "close": 78.77}, {"date": "2020-05-15", "close": 72.99}, {"date": "2020-05-22", "close": 76.03}, {"date": "2020-05-29", "close": 82.69}, {"date": "2020-06-05", "close": 94.52}, {"date": "2020-06-12", "close": 84.86}, {"date": "2020-06-19", "close": 83.11}, {"date": "2020-06-26", "close": 78.68}, {"date": "2020-07-03", "close": 79.5}, {"date": "2020-07-10", "close": 82.6}, {"date": "2020-07-17", "close": 84.22}, {"date": "2020-07-24", "close": 84.33}, {"date": "2020-07-31", "close": 82.92}, {"date": "2020-08-07", "close": 85.27}, {"date": "2020-08-14", "close": 87.87}, {"date": "2020-08-21", "close": 83.5}, {"date": "2020-08-28", "close": 88.18}, {"date": "2020-09-04", "close": 88.82}, {"date": "2020-09-11", "close": 86.72}, {"date": "2020-09-18", "close": 84.39}, {"date": "2020-09-25", "close": 80.2}, {"date": "2020-10-02", "close": 83.99}, {"date": "2020-10-09", "close": 87.64}, {"date": "2020-10-16", "close": 87.91}, {"date": "2020-10-23", "close": 89.9}, {"date": "2020-10-30", "close": 84.9}, {"date": "2020-11-06", "close": 89.16}, {"date": "2020-11-13", "close": 98.79}, {"date": "2020-11-20", "close": 99.21}, {"date": "2020-11-27", "close": 104.97}, {"date": "2020-12-04", "close": 105.94}, {"date": "2020-12-11", "close": 103.54}, {"date": "2020-12-18", "close": 103.12}, {"date": "2020-12-25", "close": 107.83}, {"date": "2021-01-01", "close": 110.04}, {"date": "2021-01-08", "close": 118.64}, {"date": "2021-01-15", "close": 120.92}, {"date": "2021-01-22", "close": 116.69}, {"date": "2021-01-29", "close": 112.23}, {"date": "2021-02-05", "close": 120.35}, {"date": "2021-02-12", "close": 123.2}, {"date": "2021-02-19", "close": 129.1}, {"date": "2021-02-26", "close": 128.36}, {"date": "2021-03-05", "close": 131.63}, {"date": "2021-03-12", "close": 136.2}, {"date": "2021-03-19", "close": 135.32}, {"date": "2021-03-26", "close": 135.27}, {"date": "2021-04-02", "close": 134.07}, {"date": "2021-04-09", "close": 137.11}, {"date": "2021-04-16", "close": 134.5}, {"date": "2021-04-23", "close": 131.77}, {"date": "2021-04-30", "close": 134.95}, {"date": "2021-05-07", "close": 141.46}, {"date": "2021-05-14", "close": 143.89}, {"date": "2021-05-21", "close": 142.71}, {"date": "2021-05-28", "close": 144.1}, {"date": "2021-06-04", "close": 146.03}, {"date": "2021-06-11", "close": 140.63}, {"date": "2021-06-18", "close": 129.78}, {"date": "2021-06-25", "close": 135.16}, {"date": "2021-07-02", "close": 137.68}, {"date": "2021-07-09", "close": 137.45}, {"date": "2021-07-16", "close": 134.05}, {"date": "2021-07-23", "close": 132.93}, {"date": "2021-07-30", "close": 133.93}, {"date": "2021-08-06", "close": 138.98}, {"date": "2021-08-13", "close": 141.17}, {"date": "2021-08-20", "close": 136.53}, {"date": "2021-08-27", "close": 143.88}, {"date": "2021-09-03", "close": 140.73}, {"date": "2021-09-10", "close": 138.86}, {"date": "2021-09-17", "close": 139.14}, {"date": "2021-09-24", "close": 143.87}, {"date": "2021-10-01", "close": 147.48}, {"date": "2021-10-08", "close": 151.11}, {"date": "2021-10-15", "close": 147.9}, {"date": "2021-10-22", "close": 152.49}, {"date": "2021-10-29", "close": 150.82}, {"date": "2021-11-05", "close": 149.18}, {"date": "2021-11-12", "close": 148.13}, {"date": "2021-11-19", "close": 142.85}, {"date": "2021-11-26", "close": 143.75}, {"date": "2021-12-03", "close": 140.52}, {"date": "2021-12-10", "close": 141.88}, {"date": "2021-12-17", "close": 139.16}, {"date": "2021-12-24", "close": 139.6}, {"date": "2021-12-31", "close": 140.57}, {"date": "2022-01-07", "close": 149.28}, {"date": "2022-01-14", "close": 141.0}, {"date": "2022-01-21", "close": 129.56}, {"date": "2022-01-28", "close": 130.93}, {"date": "2022-02-04", "close": 136.24}, {"date": "2022-02-11", "close": 137.46}, {"date": "2022-02-18", "close": 135.87}, {"date": "2022-02-25", "close": 132.14}, {"date": "2022-03-04", "close": 120.03}, {"date": "2022-03-11", "close": 115.1}, {"date": "2022-03-18", "close": 125.12}, {"date": "2022-03-25", "close": 126.74}, {"date": "2022-04-01", "close": 120.84}, {"date": "2022-04-08", "close": 120.1}, {"date": "2022-04-15", "close": 113.47}, {"date": "2022-04-22", "close": 114.09}, {"date": "2022-04-29", "close": 107.38}, {"date": "2022-05-06", "close": 111.31}, {"date": "2022-05-13", "close": 107.14}, {"date": "2022-05-20", "close": 105.57}, {"date": "2022-05-27", "close": 118.1}, {"date": "2022-06-03", "close": 117.1}, {"date": "2022-06-10", "close": 107.55}, {"date": "2022-06-17", "close": 101.69}, {"date": "2022-06-24", "close": 105.55}, {"date": "2022-07-01", "close": 102.61}, {"date": "2022-07-08", "close": 103.8}, {"date": "2022-07-15", "close": 102.52}, {"date": "2022-07-22", "close": 104.16}, {"date": "2022-07-29", "close": 104.7}, {"date": "2022-08-05", "close": 105.07}, {"date": "2022-08-12", "close": 110.85}, {"date": "2022-08-19", "close": 107.67}, {"date": "2022-08-26", "close": 104.08}, {"date": "2022-09-02", "close": 103.21}, {"date": "2022-09-09", "close": 108.16}, {"date": "2022-09-16", "close": 106.26}, {"date": "2022-09-23", "close": 99.06}, {"date": "2022-09-30", "close": 94.85}, {"date": "2022-10-07", "close": 97.05}, {"date": "2022-10-14", "close": 101.82}, {"date": "2022-10-21", "close": 111.93}, {"date": "2022-10-28", "close": 115.46}, {"date": "2022-11-04", "close": 119.67}, {"date": "2022-11-11", "close": 123.9}, {"date": "2022-11-18", "close": 122.56}, {"date": "2022-11-25", "close": 125.22}, {"date": "2022-12-02", "close": 123.77}, {"date": "2022-12-09", "close": 121.02}, {"date": "2022-12-16", "close": 118.4}, {"date": "2022-12-23", "close": 120.22}, {"date": "2022-12-30", "close": 122.8}, {"date": "2023-01-06", "close": 127.25}, {"date": "2023-01-13", "close": 131.93}, {"date": "2023-01-20", "close": 124.61}, {"date": "2023-01-27", "close": 129.45}, {"date": "2023-02-03", "close": 130.16}, {"date": "2023-02-10", "close": 130.11}, {"date": "2023-02-17", "close": 131.22}, {"date": "2023-02-24", "close": 130.01}, {"date": "2023-03-03", "close": 132.53}, {"date": "2023-03-10", "close": 123.29}, {"date": "2023-03-17", "close": 116.06}, {"date": "2023-03-24", "close": 115.23}, {"date": "2023-03-31", "close": 120.21}, {"date": "2023-04-07", "close": 118.51}, {"date": "2023-04-14", "close": 128.98}, {"date": "2023-04-21", "close": 130.67}, {"date": "2023-04-28", "close": 128.53}, {"date": "2023-05-05", "close": 127.13}, {"date": "2023-05-12", "close": 124.68}, {"date": "2023-05-19", "close": 129.4}, {"date": "2023-05-26", "close": 127.32}, {"date": "2023-06-02", "close": 130.6}, {"date": "2023-06-09", "close": 131.1}, {"date": "2023-06-16", "close": 133.2}, {"date": "2023-06-23", "close": 129.1}, {"date": "2023-06-30", "close": 135.22}, {"date": "2023-07-07", "close": 135.12}, {"date": "2023-07-14", "close": 140.2}, {"date": "2023-07-21", "close": 145.05}, {"date": "2023-07-28", "close": 146.89}, {"date": "2023-08-04", "close": 146.06}, {"date": "2023-08-11", "close": 144.59}, {"date": "2023-08-18", "close": 139.46}, {"date": "2023-08-25", "close": 137.66}, {"date": "2023-09-01", "close": 137.44}, {"date": "2023-09-08", "close": 134.64}, {"date": "2023-09-15", "close": 139.31}, {"date": "2023-09-22", "close": 136.42}, {"date": "2023-09-29", "close": 135.76}, {"date": "2023-10-06", "close": 136.84}, {"date": "2023-10-13", "close": 139.57}, {"date": "2023-10-20", "close": 134.81}, {"date": "2023-10-27", "close": 127.96}, {"date": "2023-11-03", "close": 134.85}, {"date": "2023-11-10", "close": 138.09}, {"date": "2023-11-17", "close": 144.12}, {"date": "2023-11-24", "close": 144.79}, {"date": "2023-12-01", "close": 147.91}, {"date": "2023-12-08", "close": 149.49}, {"date": "2023-12-15", "close": 155.82}, {"date": "2023-12-22", "close": 157.86}, {"date": "2023-12-29", "close": 160.41}, {"date": "2024-01-05", "close": 163.46}, {"date": "2024-01-12", "close": 160.4}, {"date": "2024-01-19", "close": 161.6}, {"date": "2024-01-26", "close": 163.47}, {"date": "2024-02-02", "close": 165.79}, {"date": "2024-02-09", "close": 166.06}, {"date": "2024-02-16", "close": 169.87}, {"date": "2024-02-23", "close": 174.58}, {"date": "2024-03-01", "close": 175.81}, {"date": "2024-03-08", "close": 178.59}, {"date": "2024-03-15", "close": 180.57}, {"date": "2024-03-22", "close": 186.56}, {"date": "2024-03-29", "close": 190.06}, {"date": "2024-04-05", "close": 188.44}, {"date": "2024-04-12", "close": 174.45}, {"date": "2024-04-19", "close": 177.33}, {"date": "2024-04-26", "close": 184.66}, {"date": "2024-05-03", "close": 181.82}, {"date": "2024-05-10", "close": 189.7}, {"date": "2024-05-17", "close": 195.45}, {"date": "2024-05-24", "close": 191.56}, {"date": "2024-05-31", "close": 193.39}, {"date": "2024-06-07", "close": 190.83}, {"date": "2024-06-14", "close": 184.94}, {"date": "2024-06-21", "close": 187.35}, {"date": "2024-06-28", "close": 193.03}, {"date": "2024-07-05", "close": 196.53}, {"date": "2024-07-12", "close": 196.68}, {"date": "2024-07-19", "close": 201.32}, {"date": "2024-07-26", "close": 203.68}, {"date": "2024-08-02", "close": 191.11}, {"date": "2024-08-09", "close": 197.5}, {"date": "2024-08-16", "close": 205.34}, {"date": "2024-08-23", "close": 209.51}, {"date": "2024-08-30", "close": 215.74}, {"date": "2024-09-06", "close": 203.89}, {"date": "2024-09-13", "close": 196.08}, {"date": "2024-09-20", "close": 202.58}, {"date": "2024-09-27", "close": 202.01}, {"date": "2024-10-04", "close": 203.95}, {"date": "2024-10-11", "close": 214.63}, {"date": "2024-10-18", "close": 217.61}, {"date": "2024-10-25", "close": 214.65}, {"date": "2024-11-01", "close": 215.26}, {"date": "2024-11-08", "close": 228.82}, {"date": "2024-11-15", "close": 236.86}, {"date": "2024-11-22", "close": 239.99}, {"date": "2024-11-29", "close": 241.12}, {"date": "2024-12-06", "close": 238.84}, {"date": "2024-12-13", "close": 231.68}, {"date": "2024-12-20", "close": 229.42}, {"date": "2024-12-27", "close": 232.86}], "KO": [{"date": "2020-03-20", "close": 38.63}, {"date": "2020-03-27", "close": 42.79}, {"date": "2020-04-03", "close": 37.21}, {"date": "2020-04-10", "close": 41.22}, {"date": "2020-04-17", "close": 40.8}, {"date": "2020-04-24", "close": 38.57}, {"date": "2020-05-01", "close": 38.71}, {"date": "2020-05-08", "close": 39.15}, {"date": "2020-05-15", "close": 36.73}, {"date": "2020-05-22", "close": 38.23}, {"date": "2020-05-29", "close": 39.63}, {"date": "2020-06-05", "close": 41.68}, {"date": "2020-06-12", "close": 38.71}, {"date": "2020-06-19", "close": 39.07}, {"date": "2020-06-26", "close": 36.99}, {"date": "2020-07-03", "close": 38.1}, {"date": "2020-07-10", "close": 38.33}, {"date": "2020-07-17", "close": 39.75}, {"date": "2020-07-24", "close": 41.17}, {"date": "2020-07-31", "close": 40.11}, {"date": "2020-08-07", "close": 40.58}, {"date": "2020-08-14", "close": 41.13}, {"date": "2020-08-21", "close": 40.14}, {"date": "2020-08-28", "close": 42.31}, {"date": "2020-09-04", "close": 43.33}, {"date": "2020-09-11", "close": 43.35}, {"date": "2020-09-18", "close": 42.83}, {"date": "2020-09-25", "close": 41.36}, {"date": "2020-10-02", "close": 41.91}, {"date": "2020-10-09", "close": 43.14}, {"date": "2020-10-16", "close": 42.48}, {"date": "2020-10-23", "close": 42.89}, {"date": "2020-10-30", "close": 40.8}, {"date": "2020-11-06", "close": 41.98}, {"date": "2020-11-13", "close": 45.38}, {"date": "2020-11-20", "close": 44.72}, {"date": "2020-11-27", "close": 44.74}, {"date": "2020-12-04", "close": 45.72}, {"date": "2020-12-11", "close": 45.29}, {"date": "2020-12-18", "close": 45.62}, {"date": "2020-12-25", "close": 45.37}, {"date": "2021-01-01", "close": 46.56}, {"date": "2021-01-08", "close": 43.37}, {"date": "2021-01-15", "close": 41.35}, {"date": "2021-01-22", "close": 41.17}, {"date": "2021-01-29", "close": 40.88}, {"date": "2021-02-05", "close": 42.15}, {"date": "2021-02-12", "close": 43.04}, {"date": "2021-02-19", "close": 42.54}, {"date": "2021-02-26", "close": 41.59}, {"date": "2021-03-05", "close": 43.12}, {"date": "2021-03-12", "close": 43.11}, {"date": "2021-03-19", "close": 43.5}, {"date": "2021-03-26", "close": 45.41}, {"date": "2021-04-02", "close": 44.95}, {"date": "2021-04-09", "close": 45.53}, {"date": "2021-04-16", "close": 45.95}, {"date": "2021-04-23", "close": 46.63}, {"date": "2021-04-30", "close": 46.21}, {"date": "2021-05-07", "close": 46.66}, {"date": "2021-05-14", "close": 46.85}, {"date": "2021-05-21", "close": 46.76}, {"date": "2021-05-28", "close": 47.33}, {"date": "2021-06-04", "close": 48.14}, {"date": "2021-06-11", "close": 48.08}, {"date": "2021-06-18", "close": 46.38}, {"date": "2021-06-25", "close": 46.85}, {"date": "2021-07-02", "close": 46.73}, {"date": "2021-07-09", "close": 46.97}, {"date": "2021-07-16", "close": 48.65}, {"date": "2021-07-23", "close": 49.17}, {"date": "2021-07-30", "close": 49.19}, {"date": "2021-08-06", "close": 48.85}, {"date": "2021-08-13", "close": 49.36}, {"date": "2021-08-20", "close": 48.85}, {"date": "2021-08-27", "close": 48.0}, {"date": "2021-09-03", "close": 48.93}, {"date": "2021-09-10", "close": 47.96}, {"date": "2021-09-17", "close": 47.31}, {"date": "2021-09-24", "close": 46.83}, {"date": "2021-10-01", "close": 46.08}, {"date": "2021-10-08", "close": 47.03}, {"date": "2021-10-15", "close": 47.34}, {"date": "2021-10-22", "close": 47.32}, {"date": "2021-10-29", "close": 48.99}, {"date": "2021-11-05", "close": 49.4}, {"date": "2021-11-12", "close": 49.2}, {"date": "2021-11-19", "close": 47.91}, {"date": "2021-11-26", "close": 46.69}, {"date": "2021-12-03", "close": 46.89}, {"date": "2021-12-10", "close": 49.29}, {"date": "2021-12-17", "close": 50.56}, {"date": "2021-12-24", "close": 50.99}, {"date": "2021-12-31", "close": 51.85}, {"date": "2022-01-07", "close": 52.83}, {"date": "2022-01-14", "close": 53.76}, {"date": "2022-01-21", "close": 52.94}, {"date": "2022-01-28", "close": 53.28}, {"date": "2022-02-04", "close": 53.39}, {"date": "2022-02-11", "close": 52.8}, {"date": "2022-02-18", "close": 54.77}, {"date": "2022-02-25", "close": 55.04}, {"date": "2022-03-04", "close": 54.8}, {"date": "2022-03-11", "close": 50.72}, {"date": "2022-03-18", "close": 53.04}, {"date": "2022-03-25", "close": 54.3}, {"date": "2022-04-01", "close": 55.48}, {"date": "2022-04-08", "close": 56.33}, {"date": "2022-04-15", "close": 57.38}, {"date": "2022-04-22", "close": 57.58}, {"date": "2022-04-29", "close": 57.02}, {"date": "2022-05-06", "close": 57.13}, {"date": "2022-05-13", "close": 58.0}, {"date": "2022-05-20", "close": 53.81}, {"date": "2022-05-27", "close": 57.08}, {"date": "2022-06-03", "close": 55.57}, {"date": "2022-06-10", "close": 54.19}, {"date": "2022-06-17", "close": 52.82}, {"date": "2022-06-24", "close": 56.03}, {"date": "2022-07-01", "close": 57.22}, {"date": "2022-07-08", "close": 56.12}, {"date": "2022-07-15", "close": 55.55}, {"date": "2022-07-22", "close": 54.74}, {"date": "2022-07-29", "close": 57.04}, {"date": "2022-08-05", "close": 56.33}, {"date": "2022-08-12", "close": 56.62}, {"date": "2022-08-19", "close": 57.93}, {"date": "2022-08-26", "close": 56.09}, {"date": "2022-09-02", "close": 54.35}, {"date": "2022-09-09", "close": 55.39}, {"date": "2022-09-16", "close": 53.31}, {"date": "2022-09-23", "close": 52.47}, {"date": "2022-09-30", "close": 50.16}, {"date": "2022-10-07", "close": 48.8}, {"date": "2022-10-14", "close": 49.22}, {"date": "2022-10-21", "close": 50.1}, {"date": "2022-10-28", "close": 54.4}, {"date": "2022-11-04", "close": 53.06}, {"date": "2022-11-11", "close": 54.9}, {"date": "2022-11-18", "close": 54.74}, {"date": "2022-11-25", "close": 56.13}, {"date": "2022-12-02", "close": 58.02}, {"date": "2022-12-09", "close": 56.93}, {"date": "2022-12-16", "close": 56.58}, {"date": "2022-12-23", "close": 57.54}, {"date": "2022-12-30", "close": 57.36}, {"date": "2023-01-06", "close": 57.17}, {"date": "2023-01-13", "close": 55.39}, {"date": "2023-01-20", "close": 54.17}, {"date": "2023-01-27", "close": 54.54}, {"date": "2023-02-03", "close": 53.95}, {"date": "2023-02-10", "close": 53.76}, {"date": "2023-02-17", "close": 54.21}, {"date": "2023-02-24", "close": 53.96}, {"date": "2023-03-03", "close": 53.6}, {"date": "2023-03-10", "close": 53.39}, {"date": "2023-03-17", "close": 54.53}, {"date": "2023-03-24", "close": 55.33}, {"date": "2023-03-31", "close": 56.36}, {"date": "2023-04-07", "close": 57.1}, {"date": "2023-04-14", "close": 57.29}, {"date": "2023-04-21", "close": 58.19}, {"date": "2023-04-28", "close": 58.29}, {"date": "2023-05-05", "close": 58.17}, {"date": "2023-05-12", "close": 58.25}, {"date": "2023-05-19", "close": 57.09}, {"date": "2023-05-26", "close": 54.75}, {"date": "2023-06-02", "close": 55.57}, {"date": "2023-06-09", "close": 54.94}, {"date": "2023-06-16", "close": 56.46}, {"date": "2023-06-23", "close": 56.03}, {"date": "2023-06-30", "close": 55.13}, {"date": "2023-07-07", "close": 54.71}, {"date": "2023-07-14", "close": 55.75}, {"date": "2023-07-21", "close": 57.16}, {"date": "2023-07-28", "close": 57.2}, {"date": "2023-08-04", "close": 55.58}, {"date": "2023-08-11", "close": 56.0}, {"date": "2023-08-18", "close": 55.8}, {"date": "2023-08-25", "close": 55.29}, {"date": "2023-09-01", "close": 54.3}, {"date": "2023-09-08", "close": 53.4}, {"date": "2023-09-15", "close": 53.47}, {"date": "2023-09-22", "close": 53.15}, {"date": "2023-09-29", "close": 51.66}, {"date": "2023-10-06", "close": 49.04}, {"date": "2023-10-13", "close": 48.81}, {"date": "2023-10-20", "close": 50.36}, {"date": "2023-10-27", "close": 50.97}, {"date": "2023-11-03", "close": 52.36}, {"date": "2023-11-10", "close": 52.34}, {"date": "2023-11-17", "close": 52.84}, {"date": "2023-11-24", "close": 54.05}, {"date": "2023-12-01", "close": 54.54}, {"date": "2023-12-08", "close": 54.51}, {"date": "2023-12-15", "close": 54.5}, {"date": "2023-12-22", "close": 54.24}, {"date": "2023-12-29", "close": 54.81}, {"date": "2024-01-05", "close": 55.5}, {"date": "2024-01-12", "close": 56.17}, {"date": "2024-01-19", "close": 55.65}, {"date": "2024-01-26", "close": 55.22}, {"date": "2024-02-02", "close": 56.31}, {"date": "2024-02-09", "close": 55.4}, {"date": "2024-02-16", "close": 55.24}, {"date": "2024-02-23", "close": 56.92}, {"date": "2024-03-01", "close": 55.37}, {"date": "2024-03-08", "close": 55.36}, {"date": "2024-03-15", "close": 56.14}, {"date": "2024-03-22", "close": 56.71}, {"date": "2024-03-29", "close": 57.36}, {"date": "2024-04-05", "close": 55.79}, {"date": "2024-04-12", "close": 54.64}, {"date": "2024-04-19", "close": 56.41}, {"date": "2024-04-26", "close": 57.88}, {"date": "2024-05-03", "close": 58.29}, {"date": "2024-05-10", "close": 59.31}, {"date": "2024-05-17", "close": 59.09}, {"date": "2024-05-24", "close": 58.13}, {"date": "2024-05-31", "close": 59.0}, {"date": "2024-06-07", "close": 59.92}, {"date": "2024-06-14", "close": 59.1}, {"date": "2024-06-21", "close": 59.31}, {"date": "2024-06-28", "close": 60.14}, {"date": "2024-07-05", "close": 60.24}, {"date": "2024-07-12", "close": 60.19}, {"date": "2024-07-19", "close": 61.69}, {"date": "2024-07-26", "close": 63.35}, {"date": "2024-08-02", "close": 65.5}, {"date": "2024-08-09", "close": 64.89}, {"date": "2024-08-16", "close": 65.36}, {"date": "2024-08-23", "close": 65.94}, {"date": "2024-08-30", "close": 68.47}, {"date": "2024-09-06", "close": 67.22}, {"date": "2024-09-13", "close": 67.93}, {"date": "2024-09-20", "close": 68.15}, {"date": "2024-09-27", "close": 68.29}, {"date": "2024-10-04", "close": 66.75}, {"date": "2024-10-11", "close": 66.18}, {"date": "2024-10-18", "close": 67.01}, {"date": "2024-10-25", "close": 63.66}, {"date": "2024-11-01", "close": 61.84}, {"date": "2024-11-08", "close": 60.81}, {"date": "2024-11-15", "close": 58.73}, {"date": "2024-11-22", "close": 60.81}, {"date": "2024-11-29", "close": 61.42}, {"date": "2024-12-06", "close": 59.94}, {"date": "2024-12-13", "close": 60.5}, {"date": "2024-12-20", "close": 59.96}, {"date": "2024-12-27", "close": 59.86}], "MSFT": [{"date": "2020-03-20", "close": 130.96}, {"date": "2020-03-27", "close": 142.74}, {"date": "2020-04-03", "close": 146.68}, {"date": "2020-04-10", "close": 157.46}, {"date": "2020-04-17", "close": 170.29}, {"date": "2020-04-24", "close": 166.43}, {"date": "2020-05-01", "close": 166.45}, {"date": "2020-05-08", "close": 176.09}, {"date": "2020-05-15", "close": 174.64}, {"date": "2020-05-22", "close": 174.98}, {"date": "2020-05-29", "close": 174.73}, {"date": "2020-06-05", "close": 178.49}, {"date": "2020-06-12", "close": 179.01}, {"date": "2020-06-19", "close": 186.07}, {"date": "2020-06-26", "close": 187.2}, {"date": "2020-07-03", "close": 196.67}, {"date": "2020-07-10", "close": 203.73}, {"date": "2020-07-17", "close": 193.44}, {"date": "2020-07-24", "close": 191.94}, {"date": "2020-07-31", "close": 195.48}, {"date": "2020-08-07", "close": 202.6}, {"date": "2020-08-14", "close": 199.18}, {"date": "2020-08-21", "close": 203.11}, {"date": "2020-08-28", "close": 218.26}, {"date": "2020-09-04", "close": 204.29}, {"date": "2020-09-11", "close": 194.54}, {"date": "2020-09-18", "close": 191.07}, {"date": "2020-09-25", "close": 198.15}, {"date": "2020-10-02", "close": 196.6}, {"date": "2020-10-09", "close": 205.77}, {"date": "2020-10-16", "close": 209.44}, {"date": "2020-10-23", "close": 206.17}, {"date": "2020-10-30", "close": 193.05}, {"date": "2020-11-06", "close": 213.31}, {"date": "2020-11-13", "close": 206.44}, {"date": "2020-11-20", "close": 200.6}, {"date": "2020-11-27", "close": 205.22}, {"date": "2020-12-04", "close": 204.39}, {"date": "2020-12-11", "close": 203.34}, {"date": "2020-12-18", "close": 208.42}, {"date": "2020-12-25", "close": 212.39}, {"date": "2021-01-01", "close": 212.08}, {"date": "2021-01-08", "close": 209.41}, {"date": "2021-01-15", "close": 202.76}, {"date": "2021-01-22", "close": 215.44}, {"date": "2021-01-29", "close": 221.17}, {"date": "2021-02-05", "close": 230.94}, {"date": "2021-02-12", "close": 233.6}, {"date": "2021-02-19", "close": 230.29}, {"date": "2021-02-26", "close": 222.08}, {"date": "2021-03-05", "close": 221.34}, {"date": "2021-03-12", "close": 225.3}, {"date": "2021-03-19", "close": 220.14}, {"date": "2021-03-26", "close": 226.0}, {"date": "2021-04-02", "close": 231.61}, {"date": "2021-04-09", "close": 244.51}, {"date": "2021-04-16", "close": 249.19}, {"date": "2021-04-23", "close": 249.58}, {"date": "2021-04-30", "close": 241.01}, {"date": "2021-05-07", "close": 241.27}, {"date": "2021-05-14", "close": 237.15}, {"date": "2021-05-21", "close": 234.85}, {"date": "2021-05-28", "close": 239.17}, {"date": "2021-06-04", "close": 240.23}, {"date": "2021-06-11", "close": 247.03}, {"date": "2021-06-18", "close": 248.51}, {"date": "2021-06-25", "close": 253.86}, {"date": "2021-07-02", "close": 265.96}, {"date": "2021-07-09", "close": 266.24}, {"date": "2021-07-16", "close": 268.93}, {"date": "2021-07-23", "close": 277.47}, {"date": "2021-07-30", "close": 272.91}, {"date": "2021-08-06", "close": 277.27}, {"date": "2021-08-13", "close": 280.52}, {"date": "2021-08-20", "close": 292.1}, {"date": "2021-08-27", "close": 287.65}, {"date": "2021-09-03", "close": 289.01}, {"date": "2021-09-10", "close": 283.8}, {"date": "2021-09-17", "close": 287.79}, {"date": "2021-09-24", "close": 287.29}, {"date": "2021-10-01", "close": 277.46}, {"date": "2021-10-08", "close": 282.98}, {"date": "2021-10-15", "close": 291.96}, {"date": "2021-10-22", "close": 296.71}, {"date": "2021-10-29", "close": 318.26}, {"date": "2021-11-05", "close": 322.53}, {"date": "2021-11-12", "close": 323.16}, {"date": "2021-11-19", "close": 329.89}, {"date": "2021-11-26", "close": 316.98}, {"date": "2021-12-03", "close": 310.57}, {"date": "2021-12-10", "close": 329.35}, {"date": "2021-12-17", "close": 311.33}, {"date": "2021-12-24", "close": 321.8}, {"date": "2021-12-31", "close": 323.37}, {"date": "2022-01-07", "close": 301.94}, {"date": "2022-01-14", "close": 298.25}, {"date": "2022-01-21", "close": 284.63}, {"date": "2022-01-28", "close": 296.39}, {"date": "2022-02-04", "close": 294.16}, {"date": "2022-02-11", "close": 283.68}, {"date": "2022-02-18", "close": 277.41}, {"date": "2022-02-25", "close": 286.45}, {"date": "2022-03-04", "close": 279.27}, {"date": "2022-03-11", "close": 269.84}, {"date": "2022-03-18", "close": 289.46}, {"date": "2022-03-25", "close": 292.59}, {"date": "2022-04-01", "close": 298.12}, {"date": "2022-04-08", "close": 286.12}, {"date": "2022-04-15", "close": 269.61}, {"date": "2022-04-22", "close": 264.02}, {"date": "2022-04-29", "close": 267.38}, {"date": "2022-05-06", "close": 264.69}, {"date": "2022-05-13", "close": 251.58}, {"date": "2022-05-20", "close": 243.9}, {"date": "2022-05-27", "close": 263.87}, {"date": "2022-06-03", "close": 260.76}, {"date": "2022-06-10", "close": 244.32}, {"date": "2022-06-17", "close": 239.16}, {"date": "2022-06-24", "close": 258.52}, {"date": "2022-07-01", "close": 250.68}, {"date": "2022-07-08", "close": 258.48}, {"date": "2022-07-15", "close": 247.92}, {"date": "2022-07-22", "close": 251.43}, {"date": "2022-07-29", "close": 271.11}, {"date": "2022-08-05", "close": 273.21}, {"date": "2022-08-12", "close": 281.9}, {"date": "2022-08-19", "close": 276.93}, {"date": "2022-08-26", "close": 259.45}, {"date": "2022-09-02", "close": 247.81}, {"date": "2022-09-09", "close": 255.94}, {"date": "2022-09-16", "close": 236.85}, {"date": "2022-09-23", "close": 230.25}, {"date": "2022-09-30", "close": 225.39}, {"date": "2022-10-07", "close": 226.69}, {"date": "2022-10-14", "close": 221.19}, {"date": "2022-10-21", "close": 234.32}, {"date": "2022-10-28", "close": 228.27}, {"date": "2022-11-04", "close": 214.25}, {"date": "2022-11-11", "close": 239.14}, {"date": "2022-11-18", "close": 234.1}, {"date": "2022-11-25", "close": 240.19}, {"date": "2022-12-02", "close": 247.49}, {"date": "2022-12-09", "close": 238.18}, {"date": "2022-12-16", "close": 237.47}, {"date": "2022-12-23", "close": 231.69}, {"date": "2022-12-30", "close": 232.74}, {"date": "2023-01-06", "close": 218.29}, {"date": "2023-01-13", "close": 232.17}, {"date": "2023-01-20", "close": 233.13}, {"date": "2023-01-27", "close": 240.84}, {"date": "2023-02-03", "close": 250.73}, {"date": "2023-02-10", "close": 255.34}, {"date": "2023-02-17", "close": 251.07}, {"date": "2023-02-24", "close": 242.47}, {"date": "2023-03-03", "close": 248.38}, {"date": "2023-03-10", "close": 241.86}, {"date": "2023-03-17", "close": 271.86}, {"date": "2023-03-24", "close": 272.97}, {"date": "2023-03-31", "close": 280.49}, {"date": "2023-04-07", "close": 283.7}, {"date": "2023-04-14", "close": 278.39}, {"date": "2023-04-21", "close": 278.02}, {"date": "2023-04-28", "close": 298.94}, {"date": "2023-05-05", "close": 302.24}, {"date": "2023-05-12", "close": 300.6}, {"date": "2023-05-19", "close": 310.4}, {"date": "2023-05-26", "close": 324.58}, {"date": "2023-06-02", "close": 327.03}, {"date": "2023-06-09", "close": 318.64}, {"date": "2023-06-16", "close": 333.79}, {"date": "2023-06-23", "close": 326.66}, {"date": "2023-06-30", "close": 332.04}, {"date": "2023-07-07", "close": 328.81}, {"date": "2023-07-14", "close": 336.63}, {"date": "2023-07-21", "close": 335.19}, {"date": "2023-07-28", "close": 329.93}, {"date": "2023-08-04", "close": 319.6}, {"date": "2023-08-11", "close": 313.0}, {"date": "2023-08-18", "close": 309.24}, {"date": "2023-08-25", "close": 315.59}, {"date": "2023-09-01", "close": 321.14}, {"date": "2023-09-08", "close": 326.62}, {"date": "2023-09-15", "close": 322.66}, {"date": "2023-09-22", "close": 309.75}, {"date": "2023-09-29", "close": 308.52}, {"date": "2023-10-06", "close": 319.77}, {"date": "2023-10-13", "close": 320.23}, {"date": "2023-10-20", "close": 319.19}, {"date": "2023-10-27", "close": 322.26}, {"date": "2023-11-03", "close": 344.73}, {"date": "2023-11-10", "close": 361.21}, {"date": "2023-11-17", "close": 362.12}, {"date": "2023-11-24", "close": 369.54}, {"date": "2023-12-01", "close": 366.68}, {"date": "2023-12-08", "close": 366.41}, {"date": "2023-12-15", "close": 362.98}, {"date": "2023-12-22", "close": 366.75}, {"date": "2023-12-29", "close": 368.18}, {"date": "2024-01-05", "close": 360.06}, {"date": "2024-01-12", "close": 380.35}, {"date": "2024-01-19", "close": 390.34}, {"date": "2024-01-26", "close": 395.49}, {"date": "2024-02-02", "close": 402.62}, {"date": "2024-02-09", "close": 411.76}, {"date": "2024-02-16", "close": 396.35}, {"date": "2024-02-23", "close": 402.51}, {"date": "2024-03-01", "close": 407.57}, {"date": "2024-03-08", "close": 398.46}, {"date": "2024-03-15", "close": 408.47}, {"date": "2024-03-22", "close": 420.55}, {"date": "2024-03-29", "close": 412.69}, {"date": "2024-04-05", "close": 417.4}, {"date": "2024-04-12", "close": 413.85}, {"date": "2024-04-19", "close": 391.5}, {"date": "2024-04-26", "close": 398.56}, {"date": "2024-05-03", "close": 398.9}, {"date": "2024-05-10", "close": 406.82}, {"date": "2024-05-17", "close": 412.93}, {"date": "2024-05-24", "close": 422.71}, {"date": "2024-05-31", "close": 407.94}, {"date": "2024-06-07", "close": 416.51}, {"date": "2024-06-14", "close": 434.9}, {"date": "2024-06-21", "close": 441.99}, {"date": "2024-06-28", "close": 439.21}, {"date": "2024-07-05", "close": 459.46}, {"date": "2024-07-12", "close": 445.69}, {"date": "2024-07-19", "close": 429.54}, {"date": "2024-07-26", "close": 417.9}, {"date": "2024-08-02", "close": 401.41}, {"date": "2024-08-09", "close": 398.99}, {"date": "2024-08-16", "close": 411.96}, {"date": "2024-08-23", "close": 410.31}, {"date": "2024-08-30", "close": 410.65}, {"date": "2024-09-06", "close": 395.45}, {"date": "2024-09-13", "close": 423.89}, {"date": "2024-09-20", "close": 428.5}, {"date": "2024-09-27", "close": 421.36}, {"date": "2024-10-04", "close": 409.59}, {"date": "2024-10-11", "close": 409.85}, {"date": "2024-10-18", "close": 411.66}, {"date": "2024-10-25", "close": 421.49}, {"date": "2024-11-01", "close": 403.99}, {"date": "2024-11-08", "close": 415.97}, {"date": "2024-11-15", "close": 408.55}, {"date": "2024-11-22", "close": 411.34}, {"date": "2024-11-29", "close": 417.71}, {"date": "2024-12-06", "close": 437.55}, {"date": "2024-12-13", "close": 441.2}, {"date": "2024-12-20", "close": 430.67}, {"date": "2024-12-27", "close": 424.68}], "XOM": [{"date": "2020-03-20", "close": 24.64}, {"date": "2020-03-27", "close": 27.81}, {"date": "2020-04-03", "close": 29.51}, {"date": "2020-04-10", "close": 32.46}, {"date": "2020-04-17", "close": 32.53}, {"date": "2020-04-24", "close": 32.91}, {"date": "2020-05-01", "close": 32.47}, {"date": "2020-05-08", "close": 34.76}, {"date": "2020-05-15", "close": 32.22}, {"date": "2020-05-22", "close": 34.22}, {"date": "2020-05-29", "close": 34.89}, {"date": "2020-06-05", "close": 40.72}, {"date": "2020-06-12", "close": 36.19}, {"date": "2020-06-19", "close": 35.28}, {"date": "2020-06-26", "close": 33.47}, {"date": "2020-07-03", "close": 33.82}, {"date": "2020-07-10", "close": 32.72}, {"date": "2020-07-17", "close": 33.39}, {"date": "2020-07-24", "close": 33.32}, {"date": "2020-07-31", "close": 32.28}, {"date": "2020-08-07", "close": 33.33}, {"date": "2020-08-14", "close": 33.8}, {"date": "2020-08-21", "close": 32.08}, {"date": "2020-08-28", "close": 31.83}, {"date": "2020-09-04", "close": 30.57}, {"date": "2020-09-11", "close": 28.87}, {"date": "2020-09-18", "close": 29.1}, {"date": "2020-09-25", "close": 27.1}, {"date": "2020-10-02", "close": 25.8}, {"date": "2020-10-09", "close": 27.18}, {"date": "2020-10-16", "close": 26.68}, {"date": "2020-10-23", "close": 26.73}, {"date": "2020-10-30", "close": 25.52}, {"date": "2020-11-06", "close": 25.65}, {"date": "2020-11-13", "close": 28.91}, {"date": "2020-11-20", "close": 29.6}, {"date": "2020-11-27", "close": 32.2}, {"date": "2020-12-04", "close": 33.4}, {"date": "2020-12-11", "close": 35.09}, {"date": "2020-12-18", "close": 34.24}, {"date": "2020-12-25", "close": 33.33}, {"date": "2021-01-01", "close": 33.03}, {"date": "2021-01-08", "close": 36.42}, {"date": "2021-01-15", "close": 38.37}, {"date": "2021-01-22", "close": 38.0}, {"date": "2021-01-29", "close": 35.93}, {"date": "2021-02-05", "close": 40.02}, {"date": "2021-02-12", "close": 41.17}, {"date": "2021-02-19", "close": 42.67}, {"date": "2021-02-26", "close": 44.3}, {"date": "2021-03-05", "close": 49.65}, {"date": "2021-03-12", "close": 50.5}, {"date": "2021-03-19", "close": 46.03}, {"date": "2021-03-26", "close": 47.02}, {"date": "2021-04-02", "close": 46.76}, {"date": "2021-04-09", "close": 45.53}, {"date": "2021-04-16", "close": 46.17}, {"date": "2021-04-23", "close": 45.28}, {"date": "2021-04-30", "close": 46.64}, {"date": "2021-05-07", "close": 50.87}, {"date": "2021-05-14", "close": 50.24}, {"date": "2021-05-21", "close": 48.71}, {"date": "2021-05-28", "close": 48.26}, {"date": "2021-06-04", "close": 50.8}, {"date": "2021-06-11", "close": 51.4}, {"date": "2021-06-18", "close": 49.93}, {"date": "2021-06-25", "close": 53.46}, {"date": "2021-07-02", "close": 52.22}, {"date": "2021-07-09", "close": 50.62}, {"date": "2021-07-16", "close": 47.39}, {"date": "2021-07-23", "close": 47.16}, {"date": "2021-07-30", "close": 47.59}, {"date": "2021-08-06", "close": 47.83}, {"date": "2021-08-13", "close": 47.64}, {"date": "2021-08-20", "close": 44.26}, {"date": "2021-08-27", "close": 46.8}, {"date": "2021-09-03", "close": 46.05}, {"date": "2021-09-10", "close": 45.3}, {"date": "2021-09-17", "close": 46.29}, {"date": "2021-09-24", "close": 48.33}, {"date": "2021-10-01", "close": 51.13}, {"date": "2021-10-08", "close": 52.18}, {"date": "2021-10-15", "close": 52.53}, {"date": "2021-10-22", "close": 52.97}, {"date": "2021-10-29", "close": 54.11}, {"date": "2021-11-05", "close": 54.57}, {"date": "2021-11-12", "close": 54.28}, {"date": "2021-11-19", "close": 51.6}, {"date": "2021-11-26", "close": 52.09}, {"date": "2021-12-03", "close": 51.79}, {"date": "2021-12-10", "close": 53.59}, {"date": "2021-12-17", "close": 51.06}, {"date": "2021-12-24", "close": 51.9}, {"date": "2021-12-31", "close": 52.04}, {"date": "2022-01-07", "close": 58.58}, {"date": "2022-01-14", "close": 61.13}, {"date": "2022-01-21", "close": 61.38}, {"date": "2022-01-28", "close": 64.03}, {"date": "2022-02-04", "close": 69.24}, {"date": "2022-02-11", "close": 68.98}, {"date": "2022-02-18", "close": 66.52}, {"date": "2022-02-25", "close": 66.94}, {"date": "2022-03-04", "close": 72.31}, {"date": "2022-03-11", "close": 73.03}, {"date": "2022-03-18", "close": 67.65}, {"date": "2022-03-25", "close": 73.27}, {"date": "2022-04-01", "close": 71.48}, {"date": "2022-04-08", "close": 74.68}, {"date": "2022-04-15", "close": 75.53}, {"date": "2022-04-22", "close": 73.21}, {"date": "2022-04-29", "close": 73.31}, {"date": "2022-05-06", "close": 78.85}, {"date": "2022-05-13", "close": 77.2}, {"date": "2022-05-20", "close": 79.8}, {"date": "2022-05-27", "close": 84.78}, {"date": "2022-06-03", "close": 86.08}, {"date": "2022-06-10", "close": 87.27}, {"date": "2022-06-17", "close": 74.82}, {"date": "2022-06-24", "close": 75.49}, {"date": "2022-07-01", "close": 76.06}, {"date": "2022-07-08", "close": 74.78}, {"date": "2022-07-15", "close": 73.44}, {"date": "2022-07-22", "close": 75.65}, {"date": "2022-07-29", "close": 84.21}, {"date": "2022-08-05", "close": 76.84}, {"date": "2022-08-12", "close": 82.46}, {"date": "2022-08-19", "close": 82.53}, {"date": "2022-08-26", "close": 85.85}, {"date": "2022-09-02", "close": 83.85}, {"date": "2022-09-09", "close": 84.65}, {"date": "2022-09-16", "close": 81.76}, {"date": "2022-09-23", "close": 75.22}, {"date": "2022-09-30", "close": 76.59}, {"date": "2022-10-07", "close": 88.62}, {"date": "2022-10-14", "close": 87.01}, {"date": "2022-10-21", "close": 92.86}, {"date": "2022-10-28", "close": 97.1}, {"date": "2022-11-04", "close": 98.52}, {"date": "2022-11-11", "close": 99.96}, {"date": "2022-11-18", "close": 99.11}, {"date": "2022-11-25", "close": 100.11}, {"date": "2022-12-02", "close": 97.14}, {"date": "2022-12-09", "close": 91.55}, {"date": "2022-12-16", "close": 92.58}, {"date": "2022-12-23", "close": 96.1}, {"date": "2022-12-30", "close": 97.53}, {"date": "2023-01-06", "close": 97.74}, {"date": "2023-01-13", "close": 100.05}, {"date": "2023-01-20", "close": 100.23}, {"date": "2023-01-27", "close": 102.23}, {"date": "2023-02-03", "close": 98.96}, {"date": "2023-02-10", "close": 105.38}, {"date": "2023-02-17", "close": 99.16}, {"date": "2023-02-24", "close": 98.68}, {"date": "2023-03-03", "close": 100.52}, {"date": "2023-03-10", "close": 96.04}, {"date": "2023-03-17", "close": 88.96}, {"date": "2023-03-24", "close": 92.25}, {"date": "2023-03-31", "close": 97.71}, {"date": "2023-04-07", "close": 102.52}, {"date": "2023-04-14", "close": 103.41}, {"date": "2023-04-21", "close": 103.37}, {"date": "2023-04-28", "close": 105.45}, {"date": "2023-05-05", "close": 96.84}, {"date": "2023-05-12", "close": 94.26}, {"date": "2023-05-19", "close": 95.5}, {"date": "2023-05-26", "close": 94.35}, {"date": "2023-06-02", "close": 95.06}, {"date": "2023-06-09", "close": 96.52}, {"date": "2023-06-16", "close": 94.49}, {"date": "2023-06-23", "close": 92.04}, {"date": "2023-06-30", "close": 96.39}, {"date": "2023-07-07", "close": 92.72}, {"date": "2023-07-14", "close": 90.72}, {"date": "2023-07-21", "close": 93.37}, {"date": "2023-07-28", "close": 93.62}, {"date": "2023-08-04", "close": 96.55}, {"date": "2023-08-11", "close": 100.51}, {"date": "2023-08-18", "close": 99.71}, {"date": "2023-08-25", "close": 98.09}, {"date": "2023-09-01", "close": 102.87}, {"date": "2023-09-08", "close": 104.76}, {"date": "2023-09-15", "close": 105.75}, {"date": "2023-09-22", "close": 104.15}, {"date": "2023-09-29", "close": 106.55}, {"date": "2023-10-06", "close": 97.11}, {"date": "2023-10-13", "close": 99.56}, {"date": "2023-10-20", "close": 100.66}, {"date": "2023-10-27", "close": 95.64}, {"date": "2023-11-03", "close": 97.66}, {"date": "2023-11-10", "close": 94.01}, {"date": "2023-11-17", "close": 95.98}, {"date": "2023-11-24", "close": 95.62}, {"date": "2023-12-01", "close": 94.18}, {"date": "2023-12-08", "close": 91.03}, {"date": "2023-12-15", "close": 92.27}, {"date": "2023-12-22", "close": 93.19}, {"date": "2023-12-29", "close": 91.43}, {"date": "2024-01-05", "close": 93.85}, {"date": "2024-01-12", "close": 91.4}, {"date": "2024-01-19", "close": 88.65}, {"date": "2024-01-26", "close": 94.19}, {"date": "2024-02-02", "close": 93.25}, {"date": "2024-02-09", "close": 93.06}, {"date": "2024-02-16", "close": 95.74}, {"date": "2024-02-23", "close": 95.84}, {"date": "2024-03-01", "close": 97.68}, {"date": "2024-03-08", "close": 100.03}, {"date": "2024-03-15", "close": 102.69}, {"date": "2024-03-22", "close": 104.74}, {"date": "2024-03-29", "close": 107.28}, {"date": "2024-04-05", "close": 112.02}, {"date": "2024-04-12", "close": 111.09}, {"date": "2024-04-19", "close": 110.64}, {"date": "2024-04-26", "close": 108.87}, {"date": "2024-05-03", "close": 107.06}, {"date": "2024-05-10", "close": 108.87}, {"date": "2024-05-17", "close": 111.32}, {"date": "2024-05-24", "close": 105.53}, {"date": "2024-05-31", "close": 109.1}, {"date": "2024-06-07", "close": 104.91}, {"date": "2024-06-14", "close": 101.52}, {"date": "2024-06-21", "close": 103.05}, {"date": "2024-06-28", "close": 107.11}, {"date": "2024-07-05", "close": 105.48}, {"date": "2024-07-12", "close": 105.39}, {"date": "2024-07-19", "close": 108.0}, {"date": "2024-07-26", "close": 109.17}, {"date": "2024-08-02", "close": 108.75}, {"date": "2024-08-09", "close": 110.58}, {"date": "2024-08-16", "close": 110.83}, {"date": "2024-08-23", "close": 109.1}, {"date": "2024-08-30", "close": 110.62}, {"date": "2024-09-06", "close": 105.65}, {"date": "2024-09-13", "close": 104.25}, {"date": "2024-09-20", "close": 108.11}, {"date": "2024-09-27", "close": 108.63}, {"date": "2024-10-04", "close": 117.08}, {"date": "2024-10-11", "close": 115.94}, {"date": "2024-10-18", "close": 112.56}, {"date": "2024-10-25", "close": 112.07}, {"date": "2024-11-01", "close": 107.81}, {"date": "2024-11-08", "close": 113.59}, {"date": "2024-11-15", "close": 112.82}, {"date": "2024-11-22", "close": 115.17}, {"date": "2024-11-29", "close": 111.55}, {"date": "2024-12-06", "close": 107.4}, {"date": "2024-12-13", "close": 104.81}, {"date": "2024-12-20", "close": 100.11}, {"date": "2024-12-27", "close": 100.69}]}, "correlation": {"AMZN": {"AMZN": 1.0, "JNJ": 0.0498, "JPM": 0.2243, "KO": 0.0774, "MSFT": 0.6392, "XOM": -0.0187}, "JNJ": {"AMZN": 0.0498, "JNJ": 1.0, "JPM": 0.2875, "KO": 0.3916, "MSFT": 0.257, "XOM": 0.2469}, "JPM": {"AMZN": 0.2243, "JNJ": 0.2875, "JPM": 1.0, "KO": 0.4828, "MSFT": 0.2696, "XOM": 0.5182}, "KO": {"AMZN": 0.0774, "JNJ": 0.3916, "JPM": 0.4828, "KO": 1.0, "MSFT": 0.3054, "XOM": 0.2863}, "MSFT": {"AMZN": 0.6392, "JNJ": 0.257, "JPM": 0.2696, "KO": 0.3054, "MSFT": 1.0, "XOM": 0.1162}, "XOM": {"AMZN": -0.0187, "JNJ": 0.2469, "JPM": 0.5182, "KO": 0.2863, "MSFT": 0.1162, "XOM": 1.0}}, "backtestDates": ["2024-01-19", "2024-01-26", "2024-02-02", "2024-02-09", "2024-02-16", "2024-02-23", "2024-03-01", "2024-03-08", "2024-03-15", "2024-03-22", "2024-03-29", "2024-04-05", "2024-04-12", "2024-04-19", "2024-04-26", "2024-05-03", "2024-05-10", "2024-05-17", "2024-05-24", "2024-05-31", "2024-06-07", "2024-06-14", "2024-06-21", "2024-06-28", "2024-07-05", "2024-07-12", "2024-07-19", "2024-07-26", "2024-08-02", "2024-08-09", "2024-08-16", "2024-08-23", "2024-08-30", "2024-09-06", "2024-09-13", "2024-09-20", "2024-09-27", "2024-10-04", "2024-10-11", "2024-10-18", "2024-10-25", "2024-11-01", "2024-11-08", "2024-11-15", "2024-11-22", "2024-11-29", "2024-12-06", "2024-12-13", "2024-12-20", "2024-12-27"], "backtestCumulative": {"Equal-Weight": [0.9991, 1.01416, 1.03167, 1.03554, 1.0337, 1.05797, 1.06356, 1.06094, 1.07212, 1.08993, 1.10144, 1.10309, 1.07773, 1.06547, 1.08075, 1.08689, 1.10658, 1.12149, 1.0976, 1.09715, 1.10306, 1.09447, 1.11262, 1.12785, 1.14435, 1.13763, 1.13967, 1.15057, 1.12578, 1.12723, 1.15253, 1.16006, 1.1812, 1.14106, 1.16502, 1.1851, 1.17555, 1.17992, 1.19061, 1.19563, 1.1805, 1.16946, 1.19914, 1.18716, 1.1984, 1.21047, 1.21694, 1.20627, 1.18351, 1.18431], "Min-Variance": [0.992, 0.9975, 1.00315, 1.00036, 1.00232, 1.02866, 1.0258, 1.02111, 1.02779, 1.03105, 1.04628, 1.03315, 1.01249, 1.01541, 1.02007, 1.03113, 1.0431, 1.05754, 1.02538, 1.03149, 1.03623, 1.02386, 1.03951, 1.04588, 1.05012, 1.05486, 1.07329, 1.09839, 1.10908, 1.099, 1.1063, 1.11878, 1.14375, 1.11867, 1.13534, 1.14325, 1.13489, 1.13606, 1.13546, 1.14461, 1.1149, 1.09862, 1.0969, 1.07616, 1.09309, 1.09982, 1.0805, 1.07269, 1.05345, 1.05432], "Max-Sharpe": [0.9948, 1.03531, 1.03778, 1.047, 1.04654, 1.05433, 1.07149, 1.0753, 1.1032, 1.12991, 1.13588, 1.16963, 1.15982, 1.12953, 1.12844, 1.11839, 1.13875, 1.16061, 1.13904, 1.14298, 1.12908, 1.13072, 1.14837, 1.17045, 1.18433, 1.16809, 1.16556, 1.15866, 1.13598, 1.14363, 1.16149, 1.14931, 1.15867, 1.11067, 1.13772, 1.16671, 1.16126, 1.19737, 1.1912, 1.17413, 1.18366, 1.13683, 1.18575, 1.17192, 1.18909, 1.17635, 1.17658, 1.16508, 1.12362, 1.12036]}, "backtestDrawdown": {"Equal-Weight": [0.0, 0.0, 0.0, 0.0, -0.177, 0.0, 0.0, -0.247, 0.0, 0.0, 0.0, 0.0, -2.299, -3.41, -2.025, -1.469, 0.0, 0.0, -2.13, -2.17, -1.643, -2.409, -0.79, 0.0, 0.0, -0.587, -0.409, 0.0, -2.155, -2.028, 0.0, 0.0, 0.0, -3.398, -1.37, 0.0, -0.806, -0.438, 0.0, 0.0, -1.265, -2.189, 0.0, -0.998, -0.062, 0.0, 0.0, -0.877, -2.747, -2.681], "Min-Variance": [0.0, 0.0, 0.0, -0.279, -0.084, 0.0, -0.277, -0.734, -0.084, 0.0, 0.0, -1.254, -3.229, -2.951, -2.505, -1.448, -0.304, 0.0, -3.04, -2.463, -2.015, -3.184, -1.705, -1.103, -0.701, -0.253, 0.0, 0.0, 0.0, -0.909, -0.251, 0.0, 0.0, -2.193, -0.735, -0.043, -0.774, -0.672, -0.725, 0.0, -2.596, -4.018, -4.168, -5.98, -4.502, -3.914, -5.601, -6.284, -7.965, -7.888], "Max-Sharpe": [0.0, 0.0, 0.0, 0.0, -0.045, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -0.839, -3.428, -3.522, -4.381, -2.64, -0.771, -2.615, -2.278, -3.467, -3.327, -1.817, 0.0, 0.0, -1.371, -1.585, -2.168, -4.083, -3.437, -1.929, -2.957, -2.167, -6.22, -3.936, -1.488, -1.948, 0.0, -0.516, -1.941, -1.146, -5.056, -0.971, -2.126, -0.692, -1.756, -1.736, -2.697, -6.159, -6.432]}, "efficientFrontier": [{"vol": 0.0221, "ret": 0.00138}, {"vol": 0.01988, "ret": 0.00153}, {"vol": 0.01845, "ret": 0.00168}, {"vol": 0.0179, "ret": 0.00183}, {"vol": 0.01758, "ret": 0.00198}, {"vol": 0.01735, "ret": 0.00213}, {"vol": 0.0172, "ret": 0.00228}, {"vol": 0.01713, "ret": 0.00243}, {"vol": 0.0171, "ret": 0.00258}, {"vol": 0.01712, "ret": 0.00273}, {"vol": 0.01719, "ret": 0.00288}, {"vol": 0.0173, "ret": 0.00303}, {"vol": 0.01745, "ret": 0.00318}, {"vol": 0.01765, "ret": 0.00333}, {"vol": 0.01789, "ret": 0.00348}, {"vol": 0.01816, "ret": 0.00363}, {"vol": 0.01848, "ret": 0.00378}, {"vol": 0.01885, "ret": 0.00393}, {"vol": 0.01926, "ret": 0.00408}, {"vol": 0.01971, "ret": 0.00424}, {"vol": 0.0202, "ret": 0.00439}, {"vol": 0.02073, "ret": 0.00454}, {"vol": 0.02129, "ret": 0.00469}, {"vol": 0.02188, "ret": 0.00484}, {"vol": 0.02249, "ret": 0.00499}, {"vol": 0.02314, "ret": 0.00514}, {"vol": 0.02381, "ret": 0.00529}, {"vol": 0.02504, "ret": 0.00544}, {"vol": 0.02831, "ret": 0.00559}, {"vol": 0.03309, "ret": 0.00574}], "edaSummary": [{"ticker": "AMZN", "avgReturn": 0.00368, "avgVol": 0.2947, "skew": -0.156, "kurt": 1.074}, {"ticker": "JNJ", "avgReturn": 0.00076, "avgVol": 0.161, "skew": -0.001, "kurt": 1.887}, {"ticker": "JPM", "avgReturn": 0.00392, "avgVol": 0.2517, "skew": -0.062, "kurt": 2.199}, {"ticker": "KO", "avgReturn": 0.00136, "avgVol": 0.1746, "skew": -0.474, "kurt": 3.737}, {"ticker": "MSFT", "avgReturn": 0.00412, "avgVol": 0.2366, "skew": 0.03, "kurt": 1.143}, {"ticker": "XOM", "avgReturn": 0.0048, "avgVol": 0.2943, "skew": -0.184, "kurt": 2.485}], "modelComparison": {"AMZN": {"Naive (zero)": {"mae": 0.02784, "rmse": 0.03617, "r2": -0.03781}, "Naive (persist)": {"mae": 0.0384, "rmse": 0.04821, "r2": -0.8432}, "Linear Reg": {"mae": 0.02889, "rmse": 0.0364, "r2": -0.05066}, "Ridge": {"mae": 0.02772, "rmse": 0.03584, "r2": -0.01867}, "Lasso": {"mae": 0.02771, "rmse": 0.03583, "r2": -0.01813}}, "JNJ": {"Naive (zero)": {"mae": 0.01615, "rmse": 0.01973, "r2": -0.00668}, "Naive (persist)": {"mae": 0.02144, "rmse": 0.02619, "r2": -0.7736}, "Linear Reg": {"mae": 0.01662, "rmse": 0.02084, "r2": -0.12275}, "Ridge": {"mae": 0.01695, "rmse": 0.02075, "r2": -0.11312}, "Lasso": {"mae": 0.01637, "rmse": 0.0201, "r2": -0.04472}}, "JPM": {"Naive (zero)": {"mae": 0.02309, "rmse": 0.02873, "r2": -0.06669}, "Naive (persist)": {"mae": 0.02933, "rmse": 0.03778, "r2": -0.84373}, "Linear Reg": {"mae": 0.0224, "rmse": 0.0287, "r2": -0.06406}, "Ridge": {"mae": 0.02175, "rmse": 0.02811, "r2": -0.0205}, "Lasso": {"mae": 0.02183, "rmse": 0.02815, "r2": -0.0238}}, "KO": {"Naive (zero)": {"mae": 0.01608, "rmse": 0.01975, "r2": -0.00504}, "Naive (persist)": {"mae": 0.02139, "rmse": 0.02741, "r2": -0.93554}, "Linear Reg": {"mae": 0.01725, "rmse": 0.02117, "r2": -0.15539}, "Ridge": {"mae": 0.01686, "rmse": 0.02073, "r2": -0.107}, "Lasso": {"mae": 0.01656, "rmse": 0.02044, "r2": -0.07611}}, "MSFT": {"Naive (zero)": {"mae": 0.02259, "rmse": 0.02695, "r2": -0.0022}, "Naive (persist)": {"mae": 0.03164, "rmse": 0.03943, "r2": -1.14531}, "Linear Reg": {"mae": 0.02211, "rmse": 0.02691, "r2": 0.00086}, "Ridge": {"mae": 0.02238, "rmse": 0.02707, "r2": -0.0112}, "Lasso": {"mae": 0.02232, "rmse": 0.02712, "r2": -0.01545}}, "XOM": {"Naive (zero)": {"mae": 0.02304, "rmse": 0.02851, "r2": -0.00939}, "Naive (persist)": {"mae": 0.03285, "rmse": 0.042, "r2": -1.19051}, "Linear Reg": {"mae": 0.02534, "rmse": 0.03153, "r2": -0.23454}, "Ridge": {"mae": 0.02296, "rmse": 0.0283, "r2": 0.00559}, "Lasso": {"mae": 0.02313, "rmse": 0.02848, "r2": -0.00685}}}, "garchParams": [{"ticker": "AMZN", "omega": 1.1844, "alpha": 0.0659, "beta": 0.8764, "persistence": 0.942}, {"ticker": "JNJ", "omega": 0.3052, "alpha": 0.0, "beta": 0.9375, "persistence": 0.938}, {"ticker": "JPM", "omega": 0.8834, "alpha": 0.048, "beta": 0.8813, "persistence": 0.929}, {"ticker": "KO", "omega": 0.2837, "alpha": 0.0451, "beta": 0.9012, "persistence": 0.946}, {"ticker": "MSFT", "omega": 0.5152, "alpha": 0.0457, "beta": 0.912, "persistence": 0.958}, {"ticker": "XOM", "omega": 0.0, "alpha": 0.0, "beta": 0.9947, "persistence": 0.995}], "garchVolEval": [{"ticker": "AMZN", "forecast": 0.04381, "realized": 0.02754}, {"ticker": "JNJ", "forecast": 0.0221, "realized": 0.01618}, {"ticker": "JPM", "forecast": 0.03442, "realized": 0.02311}, {"ticker": "KO", "forecast": 0.02201, "realized": 0.01621}, {"ticker": "MSFT", "forecast": 0.03354, "realized": 0.02269}, {"ticker": "XOM", "forecast": 0.03315, "realized": 0.02345}], "monteCarlo": [{"name": "AMZN", "var95": 34.88, "cvar95": 42.52, "var99": 47.69, "cvar99": 52.75}, {"name": "JNJ", "var95": 17.87, "cvar95": 22.95, "var99": 26.25, "cvar99": 29.66}, {"name": "JPM", "var95": 19.71, "cvar95": 27.96, "var99": 33.47, "cvar99": 39.27}, {"name": "KO", "var95": 14.77, "cvar95": 20.03, "var99": 23.19, "cvar99": 27.2}, {"name": "MSFT", "var95": 16.37, "cvar95": 24.02, "var99": 28.97, "cvar99": 33.96}, {"name": "XOM", "var95": 11.9, "cvar95": 20.09, "var99": 24.94, "cvar99": 31.02}, {"name": "Equal-Weight Portfolio", "var95": 6.9, "cvar95": 12.07, "var99": 15.06, "cvar99": 19.45, "highlight": true}], "portfolioWeights": {"tickers": ["AMZN", "JNJ", "JPM", "KO", "MSFT", "XOM"], "Equal-Weight": [0.1667, 0.1667, 0.1667, 0.1667, 0.1667, 0.1667], "Min-Variance": [0.0867, 0.3767, 0.0, 0.3232, 0.0476, 0.1658], "Max-Sharpe": [0.0, 0.0, 0.0, 0.0, 0.4416, 0.5584]}, "portfolioMetrics": [{"name": "Equal-Weight", "weeklyRet": 0.00343, "weeklyVol": 0.01998, "annualRet": 0.19517, "annualVol": 0.14406, "sharpe": 0.14345}, {"name": "Min-Variance", "weeklyRet": 0.00259, "weeklyVol": 0.0171, "annualRet": 0.14395, "annualVol": 0.12333, "sharpe": 0.11816}, {"name": "Max-Sharpe", "weeklyRet": 0.00534, "weeklyVol": 0.02405, "annualRet": 0.31912, "annualVol": 0.17341, "sharpe": 0.19843}], "backtestMetrics": [{"name": "Equal-Weight", "totalRet": 0.1843, "annualRet": 0.1924, "annualVol": 0.0969, "sharpe": 1.5618, "maxDd": -0.0341}, {"name": "Min-Variance", "totalRet": 0.0543, "annualRet": 0.0566, "annualVol": 0.0939, "sharpe": 0.3174, "maxDd": -0.0796}, {"name": "Max-Sharpe", "totalRet": 0.1204, "annualRet": 0.1255, "annualVol": 0.1357, "sharpe": 0.7207, "maxDd": -0.0643}]};
+</script>
+<script>
+const PALETTE = {
+  AMZN: "#E8A200", JNJ: "#1D8FA6", JPM: "#E1584C",
+  KO: "#3E9A66", MSFT: "#7A6FCC", XOM: "#C77B2E",
+};
+const PORT_COLOR = { "Equal-Weight": "#E8A200", "Min-Variance": "#E1584C", "Max-Sharpe": "#1D8FA6" };
+const TICKERS = ["AMZN", "JNJ", "JPM", "KO", "MSFT", "XOM"];
+const fmtPct = (v, d = 1) => (v * 100).toFixed(d) + "%";
+const fmtNum = (v, d = 4) => v.toFixed(d);
+
+// ================= SECTION: Overview =================
+function heroSparkline() {
+  const values = DATA.backtestCumulative["Equal-Weight"];
+  const w = 150, h = 54, pad = 4;
+  const min = Math.min(...values), max = Math.max(...values);
+  const x = (i) => pad + (i / (values.length - 1)) * (w - pad * 2);
+  const y = (v) => h - pad - ((v - min) / (max - min || 1)) * (h - pad * 2);
+  const path = values.map((v, i) => `${i === 0 ? "M" : "L"} ${x(i).toFixed(1)} ${y(v).toFixed(1)}`).join(" ");
+  const areaPath = `${path} L ${x(values.length - 1).toFixed(1)} ${h} L ${x(0).toFixed(1)} ${h} Z`;
+  return `<svg viewBox="0 0 ${w} ${h}" width="${w}" height="${h}">
+    <defs><linearGradient id="hero-grad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#E8A200" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#E8A200" stop-opacity="0"/>
+    </linearGradient></defs>
+    <path d="${areaPath}" fill="url(#hero-grad)"/>
+    <path d="${path}" fill="none" stroke="#E8A200" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="${x(values.length - 1)}" cy="${y(values[values.length - 1])}" r="3" fill="#E8A200"/>
+  </svg>`;
+}
+
+function renderOverview() {
+  return `
+    <div class="eyebrow">Mini-Project &middot; BIA405 Predictive Analytics in Finance and Business</div>
+    <h1>Machine Learning-Based Stock Portfolio Optimization and Risk Forecasting</h1>
+    <p class="dek">Six sector-diverse large-cap equities, five years of weekly data (2020&ndash;2025), a full pipeline from data cleaning through backtested portfolio performance. Hover any chart for exact figures; click legend items to isolate a series.</p>
+
+    <div class="hero-stat">
+      <div class="hero-num">1.56</div>
+      <div class="hero-text">Out-of-sample Sharpe ratio of the naive <b>Equal-Weight</b> portfolio &ndash; higher than both the Minimum-Variance (0.32) and Maximum-Sharpe (0.72) portfolios the optimizer actually recommended. A textbook illustration of the &ldquo;1/N puzzle&rdquo;: optimized weights are only as good as their input estimates, and estimation error here outweighed the theoretical benefit of optimization.</div>
+      <div class="hero-spark">
+        ${heroSparkline()}
+        <div class="hero-spark-label">Equal-Weight growth of $1, test period (real backtest)</div>
+      </div>
+    </div>
+
+    <div class="grid-3">
+      <div class="stat-box"><div class="label">Companies / sectors</div><div class="value">6</div></div>
+      <div class="stat-box"><div class="label">Weekly observations / company</div><div class="value">250</div></div>
+      <div class="stat-box"><div class="label">Test period (out-of-sample)</div><div class="value">50 wks</div></div>
+    </div>
+
+    <hr class="divider"/>
+    <h3 style="font-size:16px;margin-bottom:4px;">What each stage found</h3>
+    <div class="card-note" style="margin-bottom:14px;">Click a row to jump to that stage.</div>
+    <table>
+      <tr><th style="text-align:left">Stage</th><th style="text-align:left">Finding</th></tr>
+      <tr class="hover-row" data-jump="eda"><td>Data &amp; EDA</td><td style="text-align:left">Every stock shows fat-tailed weekly returns (positive excess kurtosis) &rarr; justifies GARCH</td></tr>
+      <tr class="hover-row" data-jump="returns"><td>Return Prediction</td><td style="text-align:left">A regression variant (Lasso, Ridge, or Linear Regression) beats the naive baseline on 4 of 6 stocks</td></tr>
+      <tr class="hover-row" data-jump="risk"><td>Risk Forecasting</td><td style="text-align:left">GARCH systematically over-forecasts volatility vs. the calmer 2024 test period</td></tr>
+      <tr class="hover-row" data-jump="montecarlo"><td>Monte Carlo</td><td style="text-align:left">Portfolio-level 95% VaR (6.9%) is roughly half the safest single stock's VaR</td></tr>
+      <tr class="hover-row" data-jump="portfolio"><td>Portfolio Optimization</td><td style="text-align:left">Max-Sharpe concentrates 100% in MSFT + XOM based on training-period estimates</td></tr>
+      <tr class="highlight hover-row" data-jump="backtest"><td>Backtest</td><td style="text-align:left">Equal-Weight beats both optimized portfolios out-of-sample on every metric</td></tr>
+    </table>
+  `;
+}
+
+// ================= SECTION: Data & EDA =================
+function renderEDA() {
+  const priceSeries = TICKERS.map((t) => ({ name: t, color: PALETTE[t], values: DATA.priceSeries[t].map((d) => d.close) }));
+  const dates = DATA.priceSeries.AMZN.map((d) => d.date.slice(0, 7));
+  const retVolRows = DATA.edaSummary.slice().sort((a, b) => b.avgReturn - a.avgReturn)
+    .map((r) => `<tr class="hover-row"><td>${r.ticker}</td><td>${fmtNum(r.avgReturn, 5)}</td><td>${fmtPct(r.avgVol, 2)}</td><td>${r.skew.toFixed(3)}</td><td>${r.kurt.toFixed(3)}</td></tr>`).join("");
+
+  return `
+    <div class="eyebrow">Stage 01 &middot; Steps 5&ndash;6</div>
+    <h1>Data &amp; Exploratory Analysis</h1>
+    <p class="dek">Daily price data (2020&ndash;2025) resampled to weekly frequency, cleaned, and feature-engineered before any modelling begins.</p>
+
+    <div class="card">
+      <h3>Weekly closing price, all companies</h3>
+      <div class="card-note">Hover the chart for exact prices by date. Click a ticker in the legend to hide/show it.</div>
+      ${lineChart({ series: priceSeries, xLabels: dates, yFormat: (v) => "$" + v.toFixed(0) })}
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <h3>Return correlation</h3>
+        <div class="card-note">Hover any cell for the exact correlation. AMZN&ndash;MSFT most correlated (0.64); AMZN&ndash;XOM least (&minus;0.02).</div>
+        ${heatmap(DATA.correlation, TICKERS)}
+      </div>
+      <div class="card">
+        <h3>Return &amp; risk profile</h3>
+        <div class="card-note">Positive excess kurtosis everywhere &rarr; fat tails &rarr; motivates GARCH (Stage 03)</div>
+        <table>
+          <tr><th style="text-align:left">Ticker</th><th>Avg wk. return</th><th>Ann. vol.</th><th>Skew</th><th>Kurtosis</th></tr>
+          ${retVolRows}
+        </table>
+      </div>
+    </div>
+  `;
+}
+
+// ================= SECTION: Return Prediction =================
+function renderReturnPrediction() {
+  const models = ["Naive (zero)", "Naive (persist)", "Linear Reg", "Ridge", "Lasso"];
+  const colors = { "Naive (zero)": "#9AA3B2", "Naive (persist)": "#647085", "Linear Reg": "#E8A200", Ridge: "#1D8FA6", Lasso: "#8B5FBF" };
+  const series = models.map((m) => ({ name: m, color: colors[m], values: TICKERS.map((t) => DATA.modelComparison[t][m].rmse) }));
+  const bestPerTicker = { AMZN: "Lasso", JNJ: "Naive (zero)", JPM: "Ridge", KO: "Naive (zero)", MSFT: "Linear Reg", XOM: "Ridge" };
+  const rows = TICKERS.map((t) => {
+    const m = DATA.modelComparison[t];
+    return `<tr class="best hover-row"><td>${t}</td>` + models.map((mo) => `<td ${mo === bestPerTicker[t] ? 'style="color:#B87E00;font-weight:700;"' : ""}>${m[mo].rmse.toFixed(4)}</td>`).join("") + `</tr>`;
+  }).join("");
+
+  return `
+    <div class="eyebrow">Stage 02 &middot; Steps 7 &amp; 8</div>
+    <h1>Return Prediction</h1>
+    <p class="dek">Linear Regression, Ridge, and Lasso, evaluated on a 50-week out-of-sample test set against two naive baselines. Lower RMSE is better. Hover any bar for the exact value; click a legend item to isolate that model.</p>
+    <div class="card">
+      <h3>Test-set RMSE by model and company</h3>
+      <div class="card-note">Ridge and Lasso modestly improve on plain Linear Regression, winning for 4 of 6 stocks &ndash; but examining the fitted models shows most engineered features were shrunk to zero, so the gain reflects disciplined feature reduction rather than newly found signal.</div>
+      ${barChart({ series, categories: TICKERS, yFormat: (v) => v.toFixed(2) })}
+    </div>
+    <div class="card">
+      <h3>Full RMSE table</h3>
+      <table>
+        <tr><th style="text-align:left">Ticker</th>${models.map((m) => `<th>${m}</th>`).join("")}</tr>
+        ${rows}
+      </table>
+      <div class="footnote">Gold highlight = lowest (best) RMSE for that company. R&sup2; was at or below zero for every model/company pair except Linear Regression on MSFT (R&sup2; = 0.001) and Ridge on XOM (R&sup2; = 0.006).</div>
+    </div>
+  `;
+}
+
+// ================= SECTION: Risk Forecasting (GARCH) =================
+function renderRiskForecasting() {
+  const gRows = DATA.garchParams.map((g) => `<tr class="hover-row"><td>${g.ticker}</td><td>${g.omega.toFixed(4)}</td><td>${g.alpha.toFixed(4)}</td><td>${g.beta.toFixed(4)}</td><td>${g.persistence.toFixed(3)}</td></tr>`).join("");
+  const volSeries = [
+    { name: "Forecast volatility", color: "#E1584C", values: DATA.garchVolEval.map((g) => g.forecast) },
+    { name: "Realized volatility", color: "#1D8FA6", values: DATA.garchVolEval.map((g) => g.realized) },
+  ];
+  return `
+    <div class="eyebrow">Stage 03 &middot; Step 7 (Branch B) &amp; Step 8</div>
+    <h1>Risk Forecasting &ndash; GARCH(1,1)</h1>
+    <p class="dek">A GARCH(1,1) model fitted per company, justified directly by the fat tails found in Stage 01. Volatility persistence (&alpha;+&beta;) is high across the board.</p>
+    <div class="card">
+      <h3>Fitted GARCH(1,1) parameters</h3>
+      <table>
+        <tr><th style="text-align:left">Ticker</th><th>&omega;</th><th>&alpha;</th><th>&beta;</th><th>Persistence</th></tr>
+        ${gRows}
+      </table>
+      <div class="footnote">JNJ and XOM show boundary solutions (&alpha; = 0), a known instability when fitting GARCH to a relatively short 197-week window.</div>
+    </div>
+    <div class="card">
+      <h3>Forecast vs. realized volatility, test period</h3>
+      <div class="card-note">GARCH over-forecasts risk for every company &ndash; hover to compare exact figures.</div>
+      ${barChart({ series: volSeries, categories: TICKERS, yFormat: (v) => v.toFixed(2) })}
+    </div>
+  `;
+}
+
+// ================= SECTION: Monte Carlo =================
+function renderMonteCarlo() {
+  const rows = DATA.monteCarlo.map((m) => `<tr class="${m.highlight ? "highlight" : ""} hover-row"><td>${m.name}</td><td>${m.var95.toFixed(1)}%</td><td>${m.cvar95.toFixed(1)}%</td><td>${m.var99.toFixed(1)}%</td><td>${m.cvar99.toFixed(1)}%</td></tr>`).join("");
+  const categories = DATA.monteCarlo.map((m) => (m.name === "Equal-Weight Portfolio" ? "Portfolio" : m.name));
+  const series95 = [{ name: "95% VaR", color: "#E1584C", values: DATA.monteCarlo.map((m) => m.var95) }];
+  const series99 = [{ name: "99% VaR", color: "#B83A2F", values: DATA.monteCarlo.map((m) => m.var99) }];
+
+  const toggleId = nextId("mctoggle");
+  const chart95 = barChart({ series: series95, categories, yFormat: (v) => v.toFixed(0) + "%", showLegend: false });
+  const chart99 = barChart({ series: series99, categories, yFormat: (v) => v.toFixed(0) + "%", showLegend: false });
+
+  afterRender(() => {
+    const btn95 = document.getElementById(toggleId + "-95");
+    const btn99 = document.getElementById(toggleId + "-99");
+    const wrap95 = document.getElementById(toggleId + "-wrap95");
+    const wrap99 = document.getElementById(toggleId + "-wrap99");
+    btn95.addEventListener("click", () => { btn95.classList.add("active"); btn99.classList.remove("active"); wrap95.style.display = ""; wrap99.style.display = "none"; });
+    btn99.addEventListener("click", () => { btn99.classList.add("active"); btn95.classList.remove("active"); wrap99.style.display = ""; wrap95.style.display = "none"; });
+  });
+
+  return `
+    <div class="eyebrow">Stage 04 &middot; Step 7B</div>
+    <h1>Monte Carlo Risk Simulation</h1>
+    <p class="dek">10,000 simulated 50-week price paths per company, used to estimate Value-at-Risk and Conditional VaR &ndash; both per stock and for a correlation-aware equal-weight portfolio.</p>
+    <div class="card">
+      <h3>Value-at-Risk, single stocks vs. portfolio</h3>
+      <div class="card-note">Toggle confidence level. Diversification cuts portfolio VaR to roughly half of even the safest individual stock's VaR.</div>
+      <div class="toggle-group">
+        <button class="toggle-btn active" id="${toggleId}-95">95% confidence</button>
+        <button class="toggle-btn" id="${toggleId}-99">99% confidence</button>
+      </div>
+      <div id="${toggleId}-wrap95">${chart95}</div>
+      <div id="${toggleId}-wrap99" style="display:none">${chart99}</div>
+    </div>
+    <div class="card">
+      <h3>Full VaR / CVaR table (50-week horizon)</h3>
+      <table>
+        <tr><th style="text-align:left"></th><th>95% VaR</th><th>95% CVaR</th><th>99% VaR</th><th>99% CVaR</th></tr>
+        ${rows}
+      </table>
+    </div>
+  `;
+}
+
+// ================= SECTION: Portfolio Optimization =================
+function renderPortfolio() {
+  const stratNames = ["Equal-Weight", "Min-Variance", "Max-Sharpe"];
+  const series = stratNames.map((s) => ({ name: s, color: PORT_COLOR[s], values: DATA.portfolioWeights[s] }));
+  const frontierPoints = DATA.portfolioMetrics.map((m) => ({ name: m.name, vol: m.weeklyVol, ret: m.weeklyRet, sharpe: m.sharpe, color: PORT_COLOR[m.name] }));
+  const metricRows = DATA.portfolioMetrics.map((m) => `<tr class="hover-row"><td>${m.name}</td><td>${fmtPct(m.annualRet, 1)}</td><td>${fmtPct(m.annualVol, 1)}</td><td>${m.sharpe.toFixed(3)}</td></tr>`).join("");
+
+  return `
+    <div class="eyebrow">Stage 05 &middot; Step 9</div>
+    <h1>Portfolio Optimization</h1>
+    <p class="dek">Long-only mean-variance optimization. Expected returns use historical training-period averages; risk uses GARCH-forecast volatility combined with the training-period correlation matrix. Hover the frontier markers or bars for exact figures.</p>
+    <div class="grid-2">
+      <div class="card">
+        <h3>Efficient frontier</h3>
+        <div class="card-note">Min-Variance and Max-Sharpe sit exactly on the frontier; Equal-Weight sits inside it.</div>
+        ${frontierChart({ frontier: DATA.efficientFrontier, points: frontierPoints })}
+      </div>
+      <div class="card">
+        <h3>Portfolio weights by strategy</h3>
+        ${barChart({ series, categories: TICKERS, yFormat: (v) => (v * 100).toFixed(0) + "%" })}
+      </div>
+    </div>
+    <div class="card">
+      <h3>Expected performance (training-period estimates)</h3>
+      <table>
+        <tr><th style="text-align:left">Portfolio</th><th>Ann. return</th><th>Ann. volatility</th><th>Sharpe</th></tr>
+        ${metricRows}
+      </table>
+      <div class="footnote">These are the optimizer's <i>expectations</i>, based only on training data. Stage 06 tests them against what actually happened.</div>
+    </div>
+  `;
+}
+
+// ================= SECTION: Backtest =================
+function renderBacktest() {
+  const stratNames = ["Equal-Weight", "Min-Variance", "Max-Sharpe"];
+  const cumSeries = stratNames.map((s) => ({ name: s, color: PORT_COLOR[s], values: DATA.backtestCumulative[s] }));
+  const ddSeries = stratNames.map((s) => ({ name: s, color: PORT_COLOR[s], values: DATA.backtestDrawdown[s] }));
+  const dates = DATA.backtestDates.map((d) => d.slice(0, 7));
+  const metricRows = DATA.backtestMetrics.map((m) => {
+    const isWinner = m.name === "Equal-Weight";
+    return `<tr class="${isWinner ? "highlight" : ""} hover-row"><td>${m.name}</td><td>${fmtPct(m.totalRet, 1)}</td><td>${fmtPct(m.annualRet, 1)}</td><td>${fmtPct(m.annualVol, 1)}</td><td>${m.sharpe.toFixed(2)}</td><td>${fmtPct(m.maxDd, 1)}</td></tr>`;
+  }).join("");
+
+  return `
+    <div class="eyebrow">Stage 06 &middot; Step 10</div>
+    <h1>Out-of-Sample Backtest</h1>
+    <p class="dek">Fixed portfolio weights from Stage 05, applied to the 50-week test period's <i>realized</i> returns. Hover either chart to trace exact weekly values.</p>
+    <div class="card">
+      <h3>Growth of $1 invested</h3>
+      ${lineChart({ series: cumSeries, xLabels: dates, yFormat: (v) => "$" + v.toFixed(2), areaFor: "Equal-Weight" })}
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <h3>Drawdown from peak</h3>
+        ${lineChart({ series: ddSeries, xLabels: dates, yFormat: (v) => v.toFixed(0) + "%" })}
+      </div>
+      <div class="card">
+        <h3>Performance summary</h3>
+        <table>
+          <tr><th style="text-align:left">Portfolio</th><th>Total</th><th>Annual.</th><th>Vol.</th><th>Sharpe</th><th>Max DD</th></tr>
+          ${metricRows}
+        </table>
+        <div class="footnote">Equal-Weight wins on every measure &ndash; the &ldquo;1/N puzzle&rdquo; (DeMiguel, Garlappi &amp; Uppal, 2009).</div>
+      </div>
+    </div>
+  `;
+}
+
+// ================= App shell =================
+const ICONS = {
+  overview: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>`,
+  eda: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v16a2 2 0 0 0 2 2h16"/><path d="M7 16l4-6 3 4 5-8"/></svg>`,
+  returns: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 7l-8.5 8.5-5-5L2 17"/><path d="M16 7h6v6"/></svg>`,
+  risk: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17c2-1 3-4 4-4s2 5 4 5 2-8 4-8 2 6 3 6 2-2 3-2"/></svg>`,
+  montecarlo: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8" cy="8" r="1.2" fill="currentColor" stroke="none"/><circle cx="16" cy="8" r="1.2" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.2" fill="currentColor" stroke="none"/><circle cx="8" cy="16" r="1.2" fill="currentColor" stroke="none"/><circle cx="16" cy="16" r="1.2" fill="currentColor" stroke="none"/></svg>`,
+  portfolio: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v10l7 7"/><path d="M12 12A10 10 0 1 1 5 3.5"/></svg>`,
+  backtest: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/><path d="M12 7v5l3 3"/></svg>`,
+};
+const SECTIONS = [
+  { id: "overview", num: "00", label: "Overview", render: renderOverview },
+  { id: "eda", num: "01", label: "Data & EDA", render: renderEDA },
+  { id: "returns", num: "02", label: "Return Prediction", render: renderReturnPrediction },
+  { id: "risk", num: "03", label: "Risk Forecasting", render: renderRiskForecasting },
+  { id: "montecarlo", num: "04", label: "Monte Carlo", render: renderMonteCarlo },
+  { id: "portfolio", num: "05", label: "Portfolio Optimization", render: renderPortfolio },
+  { id: "backtest", num: "06", label: "Backtest", render: renderBacktest },
+];
+
+let CURRENT_INDEX = 0;
+let SUPPRESS_OBSERVER = false;
+
+function crumbBarHtml(s) {
+  return `<div class="crumb-bar"><span class="crumb-icon">${ICONS[s.id]}</span>Stage ${s.num} <b>${s.label}</b></div>`;
+}
+
+function initApp() {
+  const nav = document.getElementById("nav");
+  const main = document.getElementById("main");
+
+  SECTIONS.forEach((s, i) => {
+    const navItem = document.createElement("div");
+    navItem.className = "nav-item" + (i === 0 ? " active" : "");
+    navItem.dataset.id = s.id;
+    navItem.innerHTML = `<span class="nav-icon">${ICONS[s.id]}</span><span class="nav-num">${s.num}</span><span class="nav-label">${s.label}</span>`;
+    navItem.addEventListener("click", () => scrollToSection(s.id));
+    nav.appendChild(navItem);
+
+    const sectionDiv = document.createElement("div");
+    sectionDiv.className = "section";
+    sectionDiv.id = "section-" + s.id;
+    sectionDiv.innerHTML = crumbBarHtml(s) + s.render();
+    main.appendChild(sectionDiv);
+    runPendingInits();
+  });
+
+  initScrollSpy();
+
+  document.querySelectorAll("tr[data-jump]").forEach((row) => {
+    row.style.cursor = "pointer";
+    row.addEventListener("click", () => scrollToSection(row.dataset.jump));
+  });
+}
+
+function scrollToSection(id) {
+  const el = document.getElementById("section-" + id);
+  if (!el) return;
+  SUPPRESS_OBSERVER = true;
+  el.scrollIntoView({ behavior: "smooth", block: "start" });
+  setActiveIndex(SECTIONS.findIndex((s) => s.id === id));
+  window.clearTimeout(scrollToSection._t);
+  scrollToSection._t = window.setTimeout(() => { SUPPRESS_OBSERVER = false; }, 700);
+}
+
+function goNext() { if (CURRENT_INDEX < SECTIONS.length - 1) scrollToSection(SECTIONS[CURRENT_INDEX + 1].id); }
+function goPrev() { if (CURRENT_INDEX > 0) scrollToSection(SECTIONS[CURRENT_INDEX - 1].id); }
+
+function initScrollSpy() {
+  const observer = new IntersectionObserver(
+    (entries) => {
+      if (SUPPRESS_OBSERVER) return;
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          const id = entry.target.id.replace("section-", "");
+          setActiveIndex(SECTIONS.findIndex((s) => s.id === id));
+        }
+      });
+    },
+    { root: null, rootMargin: "-15% 0px -70% 0px", threshold: 0 }
+  );
+  document.querySelectorAll(".section").forEach((el) => observer.observe(el));
+}
+
+function setActiveIndex(idx) {
+  if (idx < 0) return;
+  CURRENT_INDEX = idx;
+  const id = SECTIONS[idx].id;
+  document.querySelectorAll(".nav-item").forEach((el) => el.classList.toggle("active", el.dataset.id === id));
+  updatePresenterNav();
+}
+
+function initPresenterNav() {
+  const dotsWrap = document.getElementById("pnav-dots");
+  SECTIONS.forEach((s, i) => {
+    const dot = document.createElement("button");
+    dot.className = "pnav-dot" + (i === 0 ? " active" : "");
+    dot.dataset.id = s.id;
+    dot.title = s.label;
+    dot.addEventListener("click", () => scrollToSection(s.id));
+    dotsWrap.appendChild(dot);
+  });
+  document.getElementById("pnav-prev").addEventListener("click", goPrev);
+  document.getElementById("pnav-next").addEventListener("click", goNext);
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "ArrowRight" || e.key === "PageDown") { e.preventDefault(); goNext(); }
+    else if (e.key === "ArrowLeft" || e.key === "PageUp") { e.preventDefault(); goPrev(); }
+  });
+
+  updatePresenterNav();
+}
+
+function updatePresenterNav() {
+  document.querySelectorAll(".pnav-dot").forEach((el, i) => el.classList.toggle("active", i === CURRENT_INDEX));
+  document.getElementById("pnav-prev").disabled = CURRENT_INDEX === 0;
+  document.getElementById("pnav-next").disabled = CURRENT_INDEX === SECTIONS.length - 1;
+  const label = document.getElementById("pnav-label");
+  if (label) label.textContent = `${CURRENT_INDEX + 1} / ${SECTIONS.length} \u00b7 ${SECTIONS[CURRENT_INDEX].label}`;
+}
+
+function initPresentButton() {
+  const btn = document.getElementById("present-btn");
+  const label = document.getElementById("present-btn-label");
+  if (!btn) return;
+  btn.addEventListener("click", () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch(() => {});
+    } else {
+      document.exitFullscreen().catch(() => {});
+    }
+  });
+  document.addEventListener("fullscreenchange", () => {
+    label.textContent = document.fullscreenElement ? "Exit full screen" : "Present full screen";
+  });
+}
+
+document.addEventListener("DOMContentLoaded", () => { initApp(); initPresentButton(); initPresenterNav(); });
+
+</script>
+</body>
+</html>

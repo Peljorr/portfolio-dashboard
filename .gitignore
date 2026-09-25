@@ -1,0 +1,10 @@
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+.vscode/
+*.swp
+
+# Nothing else is needed - this project has no build artifacts,
+# no dependencies, and no secrets to exclude.
